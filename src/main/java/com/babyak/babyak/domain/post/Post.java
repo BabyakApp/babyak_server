@@ -4,6 +4,7 @@ import com.babyak.babyak.DTO.post.PostKeyDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,18 +24,23 @@ import java.util.Date;
 public class Post {
     @Id
     @Column(name = "post_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer postId;
 
     @NotNull
     @Column(name = "title")
     private String title;
 
-    @NotNull
     @CreatedDate
-    @Column(name = "created_date")
+    @Column(updatable = false, nullable = false)
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime createdDate;
+
+    // 이부분 없애면 오류가...ㅠㅠ 없애고 생성일만 자동으로 나타날 수 있게 하는 방법을 더 찾아볼게요...!
+    @LastModifiedDate
+    @Column(updatable = false, nullable = false)
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime modifiedDate;
 
     @NotNull
     @Column(name = "meeting_date")
@@ -42,7 +48,7 @@ public class Post {
 
     @NotNull
     @Column(name = "meeting_time")
-    private String meetingTime;
+    private Integer meetingTime;
 
     @NotNull
     @Column(name = "meeting_site")

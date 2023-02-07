@@ -11,7 +11,7 @@ import java.util.Date;
 public class PostDTO {
     private String title;
     private @JsonFormat(pattern = "yyyy-MM-dd")Date meetingDate;
-    private String meetingTime;
+    private Integer meetingTime;
     private String meetingSite;
     private Integer maxPeople;
     private String preferredFood;
