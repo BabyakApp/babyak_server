@@ -14,7 +14,7 @@ public class Favorite {
 
     @Id
     @Column(name = "like_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer likeId;
 
     @Column(name = "user_id")

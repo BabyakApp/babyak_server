@@ -1,6 +1,5 @@
 package com.babyak.babyak.domain.post;
 
-import com.babyak.babyak.DTO.post.PostKeyDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,11 +19,10 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-@IdClass(PostKeyDTO.class)
 public class Post {
     @Id
     @Column(name = "post_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer postId;
 
     @NotNull
@@ -65,7 +63,7 @@ public class Post {
     @Column(name = "introduce")
     private String introduce;
 
-    @Id
+    @NotNull
     @Column(name = "user_id")
     private Integer userId;
 }

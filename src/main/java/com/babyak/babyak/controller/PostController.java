@@ -1,7 +1,6 @@
 package com.babyak.babyak.controller;
 
 import com.babyak.babyak.DTO.post.PostDTO;
-import com.babyak.babyak.DTO.post.PostKeyDTO;
 import com.babyak.babyak.domain.post.Post;
 import com.babyak.babyak.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +23,8 @@ public class PostController {
     }
 
     @GetMapping
-    public Optional<Post> showPost(@RequestBody PostKeyDTO postKeyDTO){
-        return postService.showPost(postKeyDTO);
+    public Optional<Post> showPost(Integer postId){
+        return postService.showPost(postId);
     }
 
 }
