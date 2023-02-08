@@ -1,46 +1,45 @@
 package com.babyak.babyak.config;
 
-import com.babyak.babyak.config.oauth.PrincipalOauth2UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import com.babyak.babyak.config.oauth.OAuth2FailureHandler;
+import com.babyak.babyak.config.oauth.OAuth2SuccessHandler;
+import com.babyak.babyak.config.oauth.OAuth2UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@RequiredArgsConstructor
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private PrincipalOauth2UserService principalOauth2UserService;
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final OAuth2UserService oauth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+        http
+                .csrf().disable()
+                .formLogin().disable()
+                .httpBasic().disable();
 
         http.authorizeRequests()
-                .antMatchers("/user/login", "/user/join").permitAll()
-                .antMatchers("/post/**", "/chat/**").access("hasRole('ROLE_USER')")
-                .anyRequest().authenticated()
+                .antMatchers("/**", "/login/oauth2/code/google").permitAll()
+                .antMatchers("/user/join").access("hasRole('ROLE_AUTH')")
+                .anyRequest().authenticated();
 
-                .and()
-                .formLogin()
-                .loginProcessingUrl("/user/login")
-                .defaultSuccessUrl("/")
-
-                .and()
-                .oauth2Login()
+        http.oauth2Login()
                 .userInfoEndpoint()
-                .userService(principalOauth2UserService);
+                .userService(oauth2UserService);
+
+        http.oauth2Login()
+                .successHandler(oAuth2SuccessHandler)
+                .failureHandler(oAuth2FailureHandler);
+
 
     }
 }

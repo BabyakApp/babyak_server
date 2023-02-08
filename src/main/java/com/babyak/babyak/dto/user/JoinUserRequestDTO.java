@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JoinUserRequestDTO {
 
-    private String email;
     private Integer studentId;
     private String nickname;
     private String depart;
     private String major;
+
 }

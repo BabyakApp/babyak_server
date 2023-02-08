@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginUserResponseDTO {
 
-    private String email;
+    private Integer userId;
     private Boolean isBlocked;
     private Boolean isJoined;
     private Boolean isEwha;
