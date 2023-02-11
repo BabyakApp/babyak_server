@@ -1,4 +1,4 @@
-package com.babyak.babyak.config.oauth;
+package com.babyak.babyak.config.oauth2;
 
 import com.babyak.babyak.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;

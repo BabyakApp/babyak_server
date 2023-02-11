@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginUserResponseDTO {
+public class SignUpResponseDTO {
 
-    private Integer userId;
-    private Boolean isBlocked;
-    private Boolean isJoined;
-    private Boolean isEwha;
-
+    private String accessToken;
+    private String refreshToken;
 }

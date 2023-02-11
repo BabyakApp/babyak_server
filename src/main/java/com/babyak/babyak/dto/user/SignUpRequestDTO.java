@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoinUserRequestDTO {
+public class SignUpRequestDTO {
 
     private Integer studentId;
     private String nickname;

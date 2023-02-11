@@ -1,4 +1,4 @@
-package com.babyak.babyak.config.oauth;
+package com.babyak.babyak.config.oauth2;
 
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
@@ -25,27 +25,32 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         System.out.println("----------------------- " + oAuth2User.getAttributes());
 
-        Integer userId = 0;
         String email = oAuth2User.getAttribute("email");
         Boolean isBlocked = false;
-        Boolean isJoined = false;
         Boolean isEwha = false;
+
+
+        // 이미 가입한 적 있는 유저인 경우
+        User userEntity = userRepository.findByEmail(email);
+        if(userEntity != null) {
+            response.sendRedirect("/user/info");
+            return;
+        }
 
 
         // idBlocked 확인
 
 
-        // isJoined 확인
-        User userEntity = userRepository.findByEmail(email);
-        if(userEntity != null) isJoined = true;
 
 
-        // 이화인 이메일 여부
+
+        // isEwha 확인
         String domain = email.substring(email.indexOf('@') + 1);
         if(domain.equals("ewhain.net")) isEwha = true;
 
 
-        if(!isBlocked && !isJoined && isEwha) {
+        // Entity 생성
+        if(!isBlocked && isEwha) {
             userEntity = User.builder()
                     .studentId(0)
                     .email(email)
@@ -57,16 +62,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .build();
 
             userRepository.save(userEntity);
-            response.sendRedirect("/auth");
+            response.sendRedirect("/auth/signup/" + email);
         }
 
-        else if(isBlocked) response.sendRedirect("/auth/reject/blocked");
-        else if(!isEwha) response.sendRedirect("/auth/reject/ewhain");
-
-        else if(isJoined) response.sendRedirect("/user/info");
-
-
-
+        else if(!isEwha) response.sendRedirect("/auth/reject/" + email + "/domain");
+        else if(isBlocked) response.sendRedirect("/auth/reject" + email + "/blocked");
 
     }
 }

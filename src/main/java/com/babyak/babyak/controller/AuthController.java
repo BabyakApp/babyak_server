@@ -1,5 +1,6 @@
 package com.babyak.babyak.controller;
 
+import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,23 +16,22 @@ public class AuthController {
 
     private final UserService userService;
 
-    @GetMapping("/")
-    public ResponseEntity<String> join() {
-        return new ResponseEntity(HttpStatus.OK);
+    @GetMapping("/signup/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponseDTO signup(@PathVariable String email) {
+        AuthResponseDTO resDTO = new AuthResponseDTO(email, "");
+        return resDTO;
     }
 
-    @GetMapping("/reject/blocked")
-    public ResponseEntity<String> blocked() {
-        return new ResponseEntity("Blocked User", HttpStatus.UNAUTHORIZED);
+    @GetMapping("/reject/{email}/{reason}")
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public AuthResponseDTO reject(@PathVariable String email, @PathVariable String reason) {
+        AuthResponseDTO resDTO;
+        if(reason.equals("blocked")) resDTO = new AuthResponseDTO(email, "blocked");
+        else resDTO = new AuthResponseDTO(email, "domain");
+
+        return resDTO;
     }
-
-    @GetMapping("/reject/ewhain")
-    public ResponseEntity<String> ewhain() {
-        return new ResponseEntity("Not Ewhain User", HttpStatus.UNAUTHORIZED);
-    }
-
-
-
 
 
 }
