@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### yml ###
-application-secret.yml
+application-secret.yml.DS_Store
