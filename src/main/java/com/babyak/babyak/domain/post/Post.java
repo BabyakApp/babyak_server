@@ -30,15 +30,9 @@ public class Post {
     private String title;
 
     @CreatedDate
-    @Column(updatable = false, nullable = false)
+    @Column(nullable = false, updatable = false)
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime createdDate;
-
-    // 이부분 없애면 오류가...ㅠㅠ 없애고 생성일만 자동으로 나타날 수 있게 하는 방법을 더 찾아볼게요...!
-    @LastModifiedDate
-    @Column(updatable = false, nullable = false)
-    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
-    private LocalDateTime modifiedDate;
 
     @NotNull
     @Column(name = "meeting_date")
