@@ -62,11 +62,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .build();
 
             userRepository.save(userEntity);
-            response.sendRedirect("/auth/signup/" + email);
+            response.sendRedirect("/user/signup/" + email);
         }
 
-        else if(!isEwha) response.sendRedirect("/auth/reject/" + email + "/domain");
-        else if(isBlocked) response.sendRedirect("/auth/reject" + email + "/blocked");
+        else if(!isEwha) response.sendRedirect("/user/reject/" + email + "/domain");
+        else if(isBlocked) response.sendRedirect("/user/reject" + email + "/blocked");
 
     }
 }

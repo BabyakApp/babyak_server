@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers("/**").permitAll()
-                .antMatchers("/user/join").access("hasRole('ROLE_AUTH')")
+                .antMatchers("/user/signup").access("hasRole('ROLE_AUTH')")
                 .anyRequest().authenticated();
 
         http.oauth2Login()

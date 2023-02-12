@@ -1,5 +1,6 @@
 package com.babyak.babyak.domain.user;
 
+import com.babyak.babyak.dto.user.SignUpRequestDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -41,4 +42,12 @@ public class User {
 
     @NotNull
     private String role;
+
+    public void signup(SignUpRequestDTO reqDTO) {
+        this.studentId = reqDTO.getStudentId();
+        this.nickname = reqDTO.getNickname();
+        this.depart = reqDTO.getDepart();
+        this.major = reqDTO.getMajor();
+        this.role = "ROLE_USER";
+    }
 }
