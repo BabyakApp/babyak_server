@@ -1,4 +1,4 @@
-package com.babyak.babyak.config.jwt;
+package com.babyak.babyak.security.jwt;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.GenericFilterBean;
@@ -16,7 +16,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
 
     }
 }

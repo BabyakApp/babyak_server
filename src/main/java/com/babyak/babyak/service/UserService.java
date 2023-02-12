@@ -3,8 +3,11 @@ package com.babyak.babyak.service;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
-import com.babyak.babyak.dto.user.SignUpResponseDTO;
+import com.babyak.babyak.dto.user.TokenResponseDTO;
+import com.babyak.babyak.security.jwt.JwtTokenProvider;
+import com.nimbusds.oauth2.sdk.ErrorResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,20 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public SignUpResponseDTO signup(SignUpRequestDTO reqDTO) {
+    public TokenResponseDTO signup(SignUpRequestDTO reqDTO) {
         User user = userRepository.findByEmail(reqDTO.getEmail());
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " + user.getNickname());
+        String accessToken = jwtTokenProvider.createToken(user.getUserId(), user.getEmail());
 
-        if(user != null) {
-            user.signup(reqDTO);
-            userRepository.save(user);
-        } else {
-            System.out.println("로그인 X 사용자");
-        }
+        user.signup(reqDTO);
+        user.setToken(accessToken);
 
-        return new SignUpResponseDTO("access", "refresh");
+        userRepository.save(user);
+
+        return new TokenResponseDTO(accessToken, "refresh");
     }
 
 }

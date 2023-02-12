@@ -1,4 +1,4 @@
-package com.babyak.babyak.config.oauth2;
+package com.babyak.babyak.security.oauth2;
 
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
@@ -59,6 +59,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .major("major")
                     .noShow(0)
                     .role("ROLE_AUTH")
+                    .token("")
                     .build();
 
             userRepository.save(userEntity);

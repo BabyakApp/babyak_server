@@ -1,11 +1,13 @@
 package com.babyak.babyak.controller;
 
+import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
-import com.babyak.babyak.dto.user.SignUpResponseDTO;
+import com.babyak.babyak.dto.user.TokenResponseDTO;
 import com.babyak.babyak.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +31,14 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public SignUpResponseDTO signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
-        SignUpResponseDTO resDTO = userService.signup(reqDTO);
+    public ResponseEntity<TokenResponseDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
+        TokenResponseDTO resDTO = userService.signup(reqDTO);
+        return ResponseEntity.ok(resDTO);
+    }
+
+    @PostMapping("/token")
+    public TokenResponseDTO token(@RequestBody @Valid SignUpRequestDTO reqDTO) {
+        TokenResponseDTO resDTO = userService.signup(reqDTO);
         return resDTO;
     }
 
@@ -47,9 +55,9 @@ public class UserController {
 
     // 구글 로그인 후 기존 회원 정보
     @GetMapping("/info")
-    public @ResponseBody String user(@AuthenticationPrincipal OAuth2User oAuth2User) {
+    public ResponseEntity<OAuth2User> user(@AuthenticationPrincipal OAuth2User oAuth2User) {
         System.out.println("========== OAuth2User Attributes : " + oAuth2User.getAttributes());
-        return "user";
+        return ResponseEntity.ok(oAuth2User);
     }
 
 
