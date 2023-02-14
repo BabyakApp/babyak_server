@@ -4,7 +4,6 @@ import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +20,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        System.out.println("----------------------- " + oAuth2User.getAttributes());
+        System.out.println("----------------------- " + principalDetails.getUser());
 
-        String email = oAuth2User.getAttribute("email");
+        String email = principalDetails.getUser().getEmail();
         Boolean isBlocked = false;
         Boolean isEwha = false;
 
@@ -51,18 +50,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // Entity 생성
         if(!isBlocked && isEwha) {
-            userEntity = User.builder()
-                    .studentId(0)
-                    .email(email)
-                    .nickname("nickname")
-                    .depart("depart")
-                    .major("major")
-                    .noShow(0)
-                    .role("ROLE_AUTH")
-                    .token("")
-                    .build();
-
+            userEntity = principalDetails.getUser();
             userRepository.save(userEntity);
+
             response.sendRedirect("/user/signup/" + email);
         }
 

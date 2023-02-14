@@ -1,4 +1,4 @@
-package com.babyak.babyak.dto.user;
+package com.babyak.babyak.dto.token;
 
 import lombok.Builder;
 import lombok.Getter;

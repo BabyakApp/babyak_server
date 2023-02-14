@@ -3,13 +3,13 @@ package com.babyak.babyak.controller;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
-import com.babyak.babyak.dto.user.TokenResponseDTO;
+import com.babyak.babyak.dto.token.TokenResponseDTO;
+import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -36,12 +36,6 @@ public class UserController {
         return ResponseEntity.ok(resDTO);
     }
 
-    @PostMapping("/token")
-    public TokenResponseDTO token(@RequestBody @Valid SignUpRequestDTO reqDTO) {
-        TokenResponseDTO resDTO = userService.signup(reqDTO);
-        return resDTO;
-    }
-
     // 구글 로그인 후 Reject 결과 알려주기 (blocked or domain 문제로 자격 없는 유저)
     @GetMapping("/reject/{email}/{reason}")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -53,13 +47,13 @@ public class UserController {
         return resDTO;
     }
 
-    // 구글 로그인 후 기존 회원 정보
+    // 구글 로그인 후 회원 정보
     @GetMapping("/info")
-    public ResponseEntity<OAuth2User> user(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        System.out.println("========== OAuth2User Attributes : " + oAuth2User.getAttributes());
-        return ResponseEntity.ok(oAuth2User);
+    public ResponseEntity<User> user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        System.out.println("========== PrincipalDetails User : " + user);
+        return ResponseEntity.ok(principalDetails.getUser());
     }
-
 
 
 }

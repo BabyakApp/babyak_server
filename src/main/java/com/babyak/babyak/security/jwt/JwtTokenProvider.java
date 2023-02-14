@@ -1,12 +1,15 @@
 package com.babyak.babyak.security.jwt;
 
-import com.babyak.babyak.domain.user.User;
+import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.security.oauth2.PrincipalDetailsService;
+import com.babyak.babyak.security.oauth2.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +20,8 @@ import java.util.Date;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
+
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -31,7 +36,7 @@ public class JwtTokenProvider {
     }
 
 
-    // 토큰 생성
+    // Token 생성
     public String createToken(Integer userId, String email) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + this.tokenPeriod);
@@ -50,11 +55,31 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-//    public Authentication getAuthentication(String token) {
-//        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-//
-//        User user = new User()
-//    }
+
+    // Token 유효성 확인
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+            return !claims.getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            System.out.println("만료된 JWT 토큰");
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+
+    // Token ->> Authentication 객체
+    public Authentication getAuthentication(String token) {
+        PrincipalDetails principalDetails = userDetailsService.loadUserByUsername(this.getTokenEmail(token));
+        return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
+    }
+
+    // Token ->> User Email 꺼내기
+    public String getTokenEmail(String token) {
+        return (String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("email");
+    }
 
 
 }
