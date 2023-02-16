@@ -6,9 +6,6 @@ import com.babyak.babyak.dto.user.SignUpRequestDTO;
 import com.babyak.babyak.dto.token.TokenResponseDTO;
 import com.babyak.babyak.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +15,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Transactional
+    public Boolean availableNickname(String nickname) {
+        User user = userRepository.findByNickname(nickname);
+
+        if(user == null) return true;
+        return false;
+    }
 
     @Transactional
     public TokenResponseDTO signup(SignUpRequestDTO reqDTO) {

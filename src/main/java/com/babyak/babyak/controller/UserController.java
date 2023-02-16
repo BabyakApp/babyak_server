@@ -21,21 +21,6 @@ public class UserController {
 
     private final UserService userService;
 
-    // 구글 로그인 후 회원가입 페이지로 이동
-    @GetMapping("/signup/{email}")
-    @ResponseStatus(HttpStatus.OK)
-    public AuthResponseDTO signup(@PathVariable String email) {
-        AuthResponseDTO resDTO = new AuthResponseDTO(email, "");
-        return resDTO;
-    }
-
-    // 회원가입
-    @PostMapping("/signup")
-    public ResponseEntity<TokenResponseDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
-        TokenResponseDTO resDTO = userService.signup(reqDTO);
-        return ResponseEntity.ok(resDTO);
-    }
-
     // 구글 로그인 후 Reject 결과 알려주기 (blocked or domain 문제로 자격 없는 유저)
     @GetMapping("/reject/{email}/{reason}")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -47,7 +32,32 @@ public class UserController {
         return resDTO;
     }
 
-    // 구글 로그인 후 회원 정보
+    // 구글 로그인 후 회원가입 페이지로 이동
+    @GetMapping("/signup/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponseDTO signup(@PathVariable String email) {
+        AuthResponseDTO resDTO = new AuthResponseDTO(email, "");
+        return resDTO;
+    }
+
+    // 닉네임 중복 확인
+    @GetMapping("/signup/check/{nickname}")
+    public ResponseEntity<Boolean> checkNickname(@PathVariable String nickname) {
+        if(userService.availableNickname(nickname)) {
+            return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        }
+        return new ResponseEntity<Boolean>(false, HttpStatus.valueOf(409));
+    }
+
+
+    // 회원가입
+    @PostMapping("/signup")
+    public ResponseEntity<TokenResponseDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
+        TokenResponseDTO resDTO = userService.signup(reqDTO);
+        return ResponseEntity.ok(resDTO);
+    }
+
+    // 회원 정보
     @GetMapping("/info")
     public ResponseEntity<User> user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
