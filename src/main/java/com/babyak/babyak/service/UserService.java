@@ -27,14 +27,16 @@ public class UserService {
     @Transactional
     public TokenResponseDTO signup(SignUpRequestDTO reqDTO) {
         User user = userRepository.findByEmail(reqDTO.getEmail());
-        String accessToken = jwtTokenProvider.createToken(user.getUserId(), user.getEmail());
+
+        String accessToken = jwtTokenProvider.createAccessToken(user.getUserId(), user.getEmail());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(), user.getEmail());
+        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO(accessToken, refreshToken);
 
         user.signup(reqDTO);
         user.setToken(accessToken);
-
         userRepository.save(user);
 
-        return new TokenResponseDTO(accessToken, "refresh");
+        return tokenResponseDTO;
     }
 
 }

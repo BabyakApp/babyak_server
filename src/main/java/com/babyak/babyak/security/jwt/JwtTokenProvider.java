@@ -1,5 +1,6 @@
 package com.babyak.babyak.security.jwt;
 
+import com.babyak.babyak.dto.token.TokenResponseDTO;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.security.oauth2.PrincipalDetailsService;
 import com.babyak.babyak.security.oauth2.UserDetailsServiceImpl;
@@ -36,10 +37,21 @@ public class JwtTokenProvider {
     }
 
 
+    // Access Token 생성
+    public String createAccessToken(Integer userId, String email) {
+        return createToken(userId, email, tokenPeriod);
+    }
+
+    // Access Token 생성
+    public String createRefreshToken(Integer userId, String email) {
+        return createToken(userId, email, refreshPeriod);
+    }
+
+
     // Token 생성
-    public String createToken(Integer userId, String email) {
+    public String createToken(Integer userId, String email, Long validTime) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + this.tokenPeriod);
+        Date validity = new Date(now.getTime() + validTime);
 
         Claims claims = Jwts.claims()
                 .setSubject(email)
@@ -49,10 +61,12 @@ public class JwtTokenProvider {
         claims.put("userId", userId);
         claims.put("email", email);
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
+
+        return token;
     }
 
 
@@ -75,6 +89,13 @@ public class JwtTokenProvider {
         PrincipalDetails principalDetails = userDetailsService.loadUserByUsername(this.getTokenEmail(token));
         return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
     }
+
+
+    // Token ->> User Id 꺼내기
+    public Integer getTokenUserId(String token) {
+        return (Integer) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("userId");
+    }
+
 
     // Token ->> User Email 꺼내기
     public String getTokenEmail(String token) {
