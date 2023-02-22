@@ -31,7 +31,6 @@ public class PrincipalDetailsService extends DefaultOAuth2UserService {
                     .major("major")
                     .noShow(0)
                     .role("ROLE_AUTH")
-                    .token("")
                     .build();
         }
 

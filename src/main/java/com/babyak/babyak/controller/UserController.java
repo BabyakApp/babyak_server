@@ -1,15 +1,19 @@
 package com.babyak.babyak.controller;
 
 import com.babyak.babyak.domain.user.User;
+import com.babyak.babyak.dto.token.RefreshTokenRequestDTO;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
-import com.babyak.babyak.dto.token.TokenResponseDTO;
+import com.babyak.babyak.dto.token.TokenDTO;
+import com.babyak.babyak.security.jwt.JwtTokenProvider;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
+import com.babyak.babyak.security.oauth2.PrincipalDetailsService;
 import com.babyak.babyak.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -20,6 +24,7 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 구글 로그인 후 Reject 결과 알려주기 (blocked or domain 문제로 자격 없는 유저)
     @GetMapping("/reject/{email}/{reason}")
@@ -49,21 +54,34 @@ public class UserController {
         return new ResponseEntity<Boolean>(false, HttpStatus.valueOf(409));
     }
 
-
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<TokenResponseDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
-        TokenResponseDTO resDTO = userService.signup(reqDTO);
+    public ResponseEntity<TokenDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
+        TokenDTO resDTO = userService.signup(reqDTO);
         return ResponseEntity.ok(resDTO);
     }
 
-    // 회원 정보
+    // Authentication 회원 정보
     @GetMapping("/info")
     public ResponseEntity<User> user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
+
         System.out.println("========== PrincipalDetails User : " + user);
         return ResponseEntity.ok(principalDetails.getUser());
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<User> test() {
+        PrincipalDetails principalDetails = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = principalDetails.getUser();
 
+        return ResponseEntity.ok(user);
+    }
+
+    // 토큰 재발급
+    @PostMapping("/token/refresh")
+    public ResponseEntity<TokenDTO> refresh(@RequestBody @Valid RefreshTokenRequestDTO reqDTO) {
+        TokenDTO resDTO = userService.regenerateToken(reqDTO.getRefreshToken());
+        return ResponseEntity.ok(resDTO);
+    }
 }

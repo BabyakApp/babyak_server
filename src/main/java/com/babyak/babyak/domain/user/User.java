@@ -43,7 +43,6 @@ public class User {
     @NotNull
     private String role;
 
-    private String token;
 
     public void signup(SignUpRequestDTO reqDTO) {
         this.studentId = reqDTO.getStudentId();

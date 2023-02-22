@@ -18,9 +18,6 @@ spring:
     host: localhost
     port: 6379
 
-jwt:
-  - secret
-
 logging:
   level:
     org.hibernate.SQL: debug

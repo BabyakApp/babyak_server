@@ -22,8 +22,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        System.out.println("----------------------- " + principalDetails.getUser());
-
         String email = principalDetails.getUser().getEmail();
         Boolean isBlocked = false;
         Boolean isEwha = false;
