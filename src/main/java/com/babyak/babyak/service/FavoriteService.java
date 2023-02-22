@@ -6,6 +6,8 @@ import com.babyak.babyak.domain.favorite.FavoriteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FavoriteService {
@@ -39,5 +41,9 @@ public class FavoriteService {
     }
     public void deleteLike(Integer flag){
         favoriteRepository.deleteById(flag);
+    }
+
+    public List<Integer> findLikes(Integer userId){
+        return favoriteRepository.selectAllPosts(userId);
     }
 }

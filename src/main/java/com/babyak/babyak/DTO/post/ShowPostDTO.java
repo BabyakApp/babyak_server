@@ -12,12 +12,17 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDTO {
+public class ShowPostDTO {
     private String title;
-    private @JsonFormat(pattern = "yyyy-MM-dd")Date meetingDate;
+    private @JsonFormat(pattern = "yyyy-MM-dd")
+    Date meetingDate;
     private Integer meetingTime;
     private String meetingSite;
     private Integer maxPeople;
     private String preferredFood;
     private String introduce;
+    private String hostName;
+    private String hostDept;
+    private Integer hostStudentId; // 학번 앞에 두자리만
+    private Integer hostUserId;
 }

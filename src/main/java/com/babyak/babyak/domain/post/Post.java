@@ -38,6 +38,7 @@ public class Post {
     @Column(name = "meeting_date")
     private @JsonFormat(pattern = "yyyy-MM-dd")Date meetingDate;
 
+    // n교시
     @NotNull
     @Column(name = "meeting_time")
     private Integer meetingTime;
