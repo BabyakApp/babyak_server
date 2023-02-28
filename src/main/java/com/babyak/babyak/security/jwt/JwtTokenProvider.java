@@ -24,7 +24,7 @@ public class JwtTokenProvider {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    @Value("${jwt.secretKey}")
+    @Value("${spring.jwt.secret}")
     private String secretKey;
     private Long tokenPeriod = 1000L * 60L * 60L;                     // 1 hour
     private Long refreshPeriod = 1000L * 60L * 60L * 24L * 30L;       // 30 days

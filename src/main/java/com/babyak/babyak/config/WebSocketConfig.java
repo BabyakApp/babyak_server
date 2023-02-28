@@ -1,6 +1,5 @@
 package com.babyak.babyak.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -10,13 +9,12 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         /**
-         * [Socket 연걸 endpoint]
+         * [Socket 연결 endpoint]
          * /ws-stomp 를 endpoint로 설정 -> 핸드쉐이크 통해 커넥션 생성
          */
         registry.addEndpoint("/ws-stomp")

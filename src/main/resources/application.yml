@@ -18,8 +18,15 @@ spring:
     host: localhost
     port: 6379
 
-jwt:
-  - secret
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      authentication-database: admin
+      database: chatdb
+      # username: 추후에 추가
+      # password: 추후에 추가
+      # uri: localhost:/chatdb
 
 logging:
   level:
