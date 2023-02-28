@@ -39,6 +39,7 @@ public class PostService {
         Post post = postRepository.findPostByPostId(postId);
         ShowPostDTO showPostDTO = new ShowPostDTO();
 
+        showPostDTO.setPostId(postId);
         showPostDTO.setTitle(post.getTitle());
         showPostDTO.setMeetingDate(post.getMeetingDate());
         showPostDTO.setMeetingTime(post.getMeetingTime());

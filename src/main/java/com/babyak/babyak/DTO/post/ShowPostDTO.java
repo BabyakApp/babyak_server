@@ -13,6 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShowPostDTO {
+    private Integer postId;
     private String title;
     private @JsonFormat(pattern = "yyyy-MM-dd")
     Date meetingDate;
