@@ -1,0 +1,73 @@
+name: Babyak CI/CD with Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    # Checkout
+    - name: Checkout
+    - uses: actions/checkout@v3
+    
+    # JDK Set-up
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    
+    # Gradle caching
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    # create application-secret.yml
+    - name: Create application-secret.yml
+      run: |
+        # application-secret.yml 생성
+        touch ./src/main/resources/application-secret.yml 
+        
+        # Secrets의 APPLICATION_SECRET 값을 application-secret.yml에 쓰기
+        echo "${{ secrets.APPLICATION_SECRET }}" > ./application-secret.yml
+      shell: bash
+    
+    # Build with Gradle
+    - name: Build with Gradle
+      run: ./gradlew bootJar
+    
+    # Docker Image Build
+    - name: Web Docker Build & Push
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker build -t ${{ secrets.DOCKER_REPO }} .
+        docker push ${{ secrets.DOCKER_REPO }}
+    
+    # EC2 접속 & Pull & 실행
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        script: |
+          sudo docker stop $(docker ps -a -q) 
+          sudo docker rm $(docker ps -a -q)
+          sudo docker rmi $(sudo docker images -q)
+          sudo docker pull ${{ secrets.DOCKER_REPO }}
+          sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}
