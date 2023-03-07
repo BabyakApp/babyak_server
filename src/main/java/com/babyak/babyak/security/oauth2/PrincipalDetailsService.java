@@ -26,7 +26,7 @@ public class PrincipalDetailsService extends DefaultOAuth2UserService {
             userEntity = User.builder()
                     .studentId(0)
                     .email(email)
-                    .nickname("nickname")
+                    .nickname(email)
                     .depart("depart")
                     .major("major")
                     .noShow(0)
