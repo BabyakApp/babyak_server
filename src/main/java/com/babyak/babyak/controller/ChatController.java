@@ -82,4 +82,15 @@ public class ChatController {
         Integer userId = principalDetails.getUser().getUserId();
         return ResponseEntity.ok(chatService.leaveChatroom(userId, roomId));
     }
+
+    /* 채팅방 삭제 */
+    @DeleteMapping("/room/{roomId}")
+    @ResponseBody
+    public ResponseEntity<CheckResponse> deleteChatroom(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long roomId
+    ) {
+        Integer userId = principalDetails.getUser().getUserId();
+        return ResponseEntity.ok(chatService.deleteChatroom(userId, roomId));
+    }
 }

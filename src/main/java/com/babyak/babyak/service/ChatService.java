@@ -66,15 +66,6 @@ public class ChatService {
         if (room.getUserList().contains(userId)) {
             response.setStatus(false);
             response.setMessage("이미 참여하고 있는 채팅방입니다.");
-
-            ChatResponse chatResponse = new ChatResponse(
-                    6L, "컴댕", "컴공 19", "테스트 메세지",
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-                    ));
-
-            redisTemplate.convertAndSend(channelTopic.getTopic(), chatResponse);
-
-
             return response;
         }
 
@@ -183,6 +174,34 @@ public class ChatService {
             return response;
         }
 
+    }
+
+    /* 채팅방 삭제 */
+    public CheckResponse deleteChatroom(Integer userId, Long roomId) {
+        CheckResponse response = new CheckResponse();
+
+        try {
+            Chatroom chatroom = chatroomRepository.findByIdx(roomId);
+
+            if (chatroom.getHostUserId() != userId || chatroom.getHostUserId() == null) {
+                response.setStatus(false);
+                response.setMessage("방장이 아니면 채팅방을 삭제할 수 없습니다.");
+                return response;
+            }
+
+            chatroomRepository.delete(chatroom);
+
+            // redis 삭제는 좀 더 알아보고
+
+            response.setStatus(true);
+            response.setMessage("[" + chatroom.getRoomName() + "] 방을 삭제했습니다.");
+            return response;
+
+        } catch (NullPointerException e) {
+            response.setStatus(false);
+            response.setMessage("채팅방 혹은 사용자의 정보를 다시 확인해주세요.");
+            return response;
+        }
     }
 
 }
