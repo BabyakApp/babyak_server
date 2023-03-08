@@ -25,6 +25,9 @@ public class Chatroom {
     private Long idx; // 채팅방 번호
     private String roomName; // 채팅방 이름
     private String description; // 채팅방 설명
+    private Integer hostUserId;
+    private String hostUserName;
+    private String hostUserInfo;
     private int maxPeople; // 최대 인원
     private int currentNumber; // 현재 참여 인원
     private String lastChatTime; // 마지막 채팅 타임

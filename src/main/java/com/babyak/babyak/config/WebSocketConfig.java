@@ -17,7 +17,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * [Socket 연결 endpoint]
          * /ws-stomp 를 endpoint로 설정 -> 핸드쉐이크 통해 커넥션 생성
          */
-        registry.addEndpoint("/ws-stomp")
+        registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
