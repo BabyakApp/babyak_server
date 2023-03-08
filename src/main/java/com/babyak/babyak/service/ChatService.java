@@ -57,7 +57,7 @@ public class ChatService {
 
 
     /* 입장 조건 확인 */
-    public CheckResponse checkEnterStatus(User user, Long roomId) {
+    public CheckResponse enterChatroom (User user, Long roomId) {
         CheckResponse response = new CheckResponse();
         Chatroom room = chatroomRepository.findByIdx(roomId);
 
@@ -71,21 +71,6 @@ public class ChatService {
                     6L, "컴댕", "컴공 19", "테스트 메세지",
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                     ));
-
-            Chatroom testRoom = chatroomRepository.findByIdx(6L);
-            testRoom.setLastChatTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-            Chat testChat = new Chat();
-            testChat.setUserId(3);
-            testChat.setNickname("컴댕");
-            testChat.setMessage("테스트 채팅");
-            testChat.setChatTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-
-            List<Chat> newChat = testRoom.getChats();
-            if (newChat == null)
-                newChat = new ArrayList<>();
-            newChat.add(testChat);
-            testRoom.setChats(newChat);
-            chatroomRepository.save(testRoom);
 
             redisTemplate.convertAndSend(channelTopic.getTopic(), chatResponse);
 
@@ -136,6 +121,9 @@ public class ChatService {
         chat.setChatTime(time);
         room.setLastChatTime(time); // 마지막 채팅 시간 업데이트
         List<Chat> chatList = room.getChats();
+        if (chatList == null) {
+            chatList = new ArrayList<>();
+        }
         chatList.add(chat);
         room.setChats(chatList); // 채팅 내역 업데이트
         chatroomRepository.save(room);
@@ -170,6 +158,31 @@ public class ChatService {
                 .collect(Collectors.toList());
 
         return responses;
+    }
+
+    /* 채팅방 나가기 */
+    public CheckResponse leaveChatroom(Integer userId, Long roomId) {
+        CheckResponse response = new CheckResponse();
+
+        try {
+            Chatroom room = chatroomRepository.findByIdxAndUserListContaining(roomId, userId);
+
+            room.setCurrentNumber(room.getCurrentNumber() - 1);
+            List<Integer> newUserList = room.getUserList();
+            newUserList.remove(userId);
+            room.setUserList(newUserList);
+            chatroomRepository.save(room);
+
+            response.setStatus(true);
+            response.setMessage("[" + room.getRoomName() + "] 방에서 나왔습니다.");
+            return response;
+
+        } catch (NullPointerException e) {
+            response.setStatus(false);
+            response.setMessage("채팅방 혹은 사용자의 정보를 다시 확인해주세요.");
+            return response;
+        }
+
     }
 
 }

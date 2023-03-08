@@ -33,15 +33,15 @@ public class ChatController {
 
 
     /* 채팅방 입장 */
-    @GetMapping("/check/{roomId}")
+    @GetMapping("/enter/{roomId}")
     @ResponseBody
-    public ResponseEntity<CheckResponse> checkEnterStatus(
+    public ResponseEntity<CheckResponse> enterChatroom (
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable Long roomId
     ) {
         User user = principalDetails.getUser();
         return ResponseEntity.ok(
-                chatService.checkEnterStatus(user, roomId)
+                chatService.enterChatroom(user, roomId)
         );
     }
 
@@ -72,4 +72,14 @@ public class ChatController {
         return ResponseEntity.ok(chatService.getUserChatroomList(userId));
     }
 
+    /* 채팅방 나가기 */
+    @GetMapping("/leave/{roomId}")
+    @ResponseBody
+    public ResponseEntity<CheckResponse> leaveChatroom(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long roomId
+    ) {
+        Integer userId = principalDetails.getUser().getUserId();
+        return ResponseEntity.ok(chatService.leaveChatroom(userId, roomId));
+    }
 }
