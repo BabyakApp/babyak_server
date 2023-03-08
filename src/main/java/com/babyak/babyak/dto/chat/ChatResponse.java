@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatResponse {
 
+    private Long roomId;
     private String userName;
     private String userInfo;
     private String message;

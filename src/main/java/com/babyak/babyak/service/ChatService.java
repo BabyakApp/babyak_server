@@ -3,10 +3,13 @@ package com.babyak.babyak.service;
 import com.babyak.babyak.domain.chat.Chat;
 import com.babyak.babyak.domain.chat.Chatroom;
 import com.babyak.babyak.domain.chat.ChatroomRepository;
+import com.babyak.babyak.domain.chat.RedisRepository;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
 import com.babyak.babyak.dto.chat.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +26,9 @@ public class ChatService {
     private final SequenceGeneratorService sequenceGeneratorService;
     private final ChatroomRepository chatroomRepository;
     private final SimpMessageSendingOperations messagingTemplate;
-    private final UserRepository userRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ChannelTopic channelTopic;
+    private final RedisRepository redisRepository;
 
     /* 채팅방 생성 */
     public ChatroomResponse createChatroom (User user, ChatroomRequest request) {
@@ -41,9 +46,12 @@ public class ChatService {
         List<Integer> userList = new ArrayList<>();
         userList.add(user.getUserId());
         chatroom.setUserList(userList);
+        List<Chat> chats = new ArrayList<>();
+        chatroom.setChats(chats);
         Chatroom room = chatroomRepository.save(chatroom);
 
         ChatroomResponse response = new ChatroomResponse(room.getIdx());
+        redisRepository.createChatroom(room.getIdx(), room.getRoomName());
         return response;
     }
 
@@ -58,6 +66,30 @@ public class ChatService {
         if (room.getUserList().contains(userId)) {
             response.setStatus(false);
             response.setMessage("이미 참여하고 있는 채팅방입니다.");
+
+            ChatResponse chatResponse = new ChatResponse(
+                    6L, "컴댕", "컴공 19", "테스트 메세지",
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                    ));
+
+            Chatroom testRoom = chatroomRepository.findByIdx(6L);
+            testRoom.setLastChatTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            Chat testChat = new Chat();
+            testChat.setUserId(3);
+            testChat.setNickname("컴댕");
+            testChat.setMessage("테스트 채팅");
+            testChat.setChatTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+
+            List<Chat> newChat = testRoom.getChats();
+            if (newChat == null)
+                newChat = new ArrayList<>();
+            newChat.add(testChat);
+            testRoom.setChats(newChat);
+            chatroomRepository.save(testRoom);
+
+            redisTemplate.convertAndSend(channelTopic.getTopic(), chatResponse);
+
+
             return response;
         }
 
@@ -109,12 +141,15 @@ public class ChatService {
         chatroomRepository.save(room);
 
         // Response
+        chatResponse.setRoomId(roomId);
         chatResponse.setUserName(nickname);
         chatResponse.setUserInfo(nickname + " " + userYear);
         chatResponse.setMessage(request.getMessage());
         chatResponse.setChatTime(time);
 
-        messagingTemplate.convertAndSend("sub/chat/room/" + request.getRoomId(), chatResponse);
+        //messagingTemplate.convertAndSend("sub/chat/room/" + request.getRoomId(), chatResponse);
+        redisTemplate.convertAndSend(channelTopic.getTopic(), chatResponse);
+
     }
 
 

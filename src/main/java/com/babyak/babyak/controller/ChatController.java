@@ -61,6 +61,7 @@ public class ChatController {
         return ResponseEntity.ok(chatService.getAllChatroom());
     }
 
+
     /* 참여한 채팅방 목록 */
     @GetMapping("/user/list")
     @ResponseBody
