@@ -84,7 +84,7 @@ public class ChatService {
         chatroomRepository.save(room); // db update
 
         response.setStatus(true);
-        response.setMessage(user.getNickname() + "님이 들어오셨습니다.");
+        response.setMessage(user.getNickname() + " 님이 들어오셨습니다.");
 
         return response;
     }
