@@ -1,17 +1,13 @@
 package com.babyak.babyak.controller;
 
-import com.babyak.babyak.domain.chat.Chat;
 import com.babyak.babyak.domain.chat.Chatroom;
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.dto.chat.ChatDto;
-import com.babyak.babyak.dto.chat.ChatroomRequest;
-import com.babyak.babyak.dto.chat.ChatroomResponse;
+import com.babyak.babyak.dto.chat.*;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +19,6 @@ import java.util.List;
 @RequestMapping("/chat")
 public class ChatController {
 
-    private final SimpMessageSendingOperations messagingTemplate;
     private final ChatService chatService;
 
     /* 채팅방 생성 */
@@ -36,13 +31,24 @@ public class ChatController {
         return ResponseEntity.ok(chatService.createChatroom(userId, request));
     }
 
-//    @MessageMapping("/message")
-//    public void message (ChatDto chat) {
-//        if (ChatDto.MessageType.ENTER.equals(chat.getType())) {
-//            chat.setMessage(chat.getUserId() + "님이 들어왔습니다.");
-//        }
-//        messagingTemplate.convertAndSend("sub/chat/room/" + chat.getRoomId(), chat);
-//    }
+    /* 채팅방 입장 */
+    @GetMapping("/check/{roomId}")
+    @ResponseBody
+    public ResponseEntity<CheckResponse> checkEnterStatus(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable Long roomId
+    ) {
+        User user = principalDetails.getUser();
+        return ResponseEntity.ok(
+                chatService.checkEnterStatus(user, roomId)
+        );
+    }
+    /* 채팅 전송 */
+    @MessageMapping("/message")
+    public void message (@AuthenticationPrincipal PrincipalDetails principalDetails, ChatRequest chat) {
+        User user = principalDetails.getUser();
+        chatService.sendMessage(user, chat);
+    }
 
     /* 채팅방 전체 목록 반환 */
     @GetMapping("/allRoom")

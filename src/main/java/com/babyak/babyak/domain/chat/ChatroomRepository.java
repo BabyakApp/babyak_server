@@ -13,5 +13,6 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
 
     public List<Chatroom> findAll();
 
-    public Chatroom findById(Long id);
+    public Chatroom findByIdx(Long idx);
+
 }
