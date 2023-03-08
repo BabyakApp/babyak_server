@@ -27,11 +27,18 @@ public class ChatController {
     public ResponseEntity<ChatroomResponse> createChatRoom(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestBody ChatroomRequest request) {
+<<<<<<< HEAD
         User user = principalDetails.getUser();
         return ResponseEntity.ok(chatService.createChatroom(user, request));
     }
 
 
+=======
+        Integer userId = principalDetails.getUser().getUserId();
+        return ResponseEntity.ok(chatService.createChatroom(userId, request));
+    }
+
+>>>>>>> Chat
     /* 채팅방 입장 */
     @GetMapping("/check/{roomId}")
     @ResponseBody
@@ -44,8 +51,11 @@ public class ChatController {
                 chatService.checkEnterStatus(user, roomId)
         );
     }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> Chat
     /* 채팅 전송 */
     @MessageMapping("/message")
     public void message (@AuthenticationPrincipal PrincipalDetails principalDetails, ChatRequest chat) {
@@ -53,7 +63,10 @@ public class ChatController {
         chatService.sendMessage(user, chat);
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> Chat
     /* 채팅방 전체 목록 반환 */
     @GetMapping("/allRoom")
     @ResponseBody
@@ -62,6 +75,7 @@ public class ChatController {
     }
 
 
+<<<<<<< HEAD
     /* 참여한 채팅방 목록 */
     @GetMapping("/user/list")
     @ResponseBody
@@ -71,4 +85,6 @@ public class ChatController {
         Integer userId = principalDetails.getUser().getUserId();
         return ResponseEntity.ok(chatService.getUserChatroomList(userId));
     }
+=======
+>>>>>>> Chat
 }

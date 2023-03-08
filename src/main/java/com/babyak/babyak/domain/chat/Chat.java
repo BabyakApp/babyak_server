@@ -1,6 +1,12 @@
 package com.babyak.babyak.domain.chat;
 
+<<<<<<< HEAD
 import lombok.*;
+=======
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+>>>>>>> Chat
 
 import java.time.LocalDateTime;
 
