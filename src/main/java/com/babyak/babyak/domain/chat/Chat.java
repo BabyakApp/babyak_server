@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @ToString
 public class Chat {
 
-    private Long userId; // 채팅 보낸 userId
-    private LocalDateTime chatTime; // 채팅 보낸 시간
+    private Integer userId; // 채팅 보낸 userId
+    private String nickname;
     private String message; // 채팅 내용
+    private String chatTime; // 채팅 보낸 시간
 
 }
