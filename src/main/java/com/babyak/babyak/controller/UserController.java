@@ -7,7 +7,6 @@ import com.babyak.babyak.dto.user.SignUpRequestDTO;
 import com.babyak.babyak.dto.token.TokenDTO;
 import com.babyak.babyak.security.jwt.JwtTokenProvider;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
-import com.babyak.babyak.security.oauth2.PrincipalDetailsService;
 import com.babyak.babyak.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -132,7 +132,7 @@ public class JwtTokenProvider {
     }
 
 
-    // Token ->> User Email 꺼내기
+    // Token -> User Email 꺼내기
     public String getTokenEmail(String token) {
         return (String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("email");
     }
@@ -171,6 +171,15 @@ public class JwtTokenProvider {
         }
 
         return null;
+    }
+
+
+    // token 의 남은 유효 시간 구하기
+    public long getExpiration(String token) {
+        Date expiration = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
+        Long now = new Date().getTime();
+
+        return (expiration.getTime() - now);
     }
 
 
