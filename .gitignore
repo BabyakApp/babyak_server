@@ -39,6 +39,7 @@ out/
 ### yml ###
 application-secret.yml
 
+
 ### macOS ###
 # General
 .DS_Store
