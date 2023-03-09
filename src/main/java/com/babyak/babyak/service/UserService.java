@@ -1,5 +1,7 @@
 package com.babyak.babyak.service;
 
+import com.babyak.babyak.common.error.CustomException;
+import com.babyak.babyak.common.error.ErrorCode;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
@@ -7,6 +9,7 @@ import com.babyak.babyak.dto.token.TokenDTO;
 import com.babyak.babyak.security.jwt.JwtTokenProvider;
 import com.babyak.babyak.security.jwt.RedisUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,9 @@ public class UserService {
     @Transactional
     public TokenDTO signup(SignUpRequestDTO reqDTO) {
         User user = userRepository.findByEmail(reqDTO.getEmail());
+        if(user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
 
         String accessToken = jwtTokenProvider.createAccessToken(user.getUserId(), user.getEmail());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(), user.getEmail());
@@ -40,8 +46,26 @@ public class UserService {
         return tokenDTO;
     }
 
-    public TokenDTO regenerateToken(String refreshToken) {
+    public TokenDTO reissueToken(String refreshToken) {
         return jwtTokenProvider.reissueToken(refreshToken);
     }
 
+
+    public String logout(TokenDTO tokenDTO) {
+        if(!jwtTokenProvider.validateToken(tokenDTO.getAccessToken())) {
+            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+        }
+
+        Authentication authentication = jwtTokenProvider.getAuthentication(tokenDTO.getAccessToken());
+
+        // 현재 Redis에 저장된 Refresh Token 삭제
+        if(redisUtil.getRedisRefreshToken(authentication.getName()) != null) {
+            redisUtil.deleteData(authentication.getName());
+        }
+
+        Long expiration = jwtTokenProvider.getExpiration(tokenDTO.getAccessToken());
+        redisUtil.setRedisLogoutAccTkn(tokenDTO.getAccessToken(), expiration);
+
+        return "로그아웃 되었습니다.";
+    }
 }

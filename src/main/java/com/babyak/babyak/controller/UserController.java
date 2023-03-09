@@ -1,7 +1,10 @@
 package com.babyak.babyak.controller;
 
+import com.babyak.babyak.common.error.CustomException;
+import com.babyak.babyak.common.error.ErrorCode;
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.dto.token.RefreshTokenRequestDTO;
+import com.babyak.babyak.dto.ResponseDTO;
+import com.babyak.babyak.dto.token.RefreshTokenDTO;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
 import com.babyak.babyak.dto.token.TokenDTO;
@@ -55,9 +58,9 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<TokenDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
-        TokenDTO resDTO = userService.signup(reqDTO);
-        return ResponseEntity.ok(resDTO);
+    public ResponseDTO<TokenDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
+        TokenDTO tokenDTO = userService.signup(reqDTO);
+        return ResponseDTO.of(HttpStatus.OK.value(), "회원가입 성공", tokenDTO);
     }
 
     // Authentication 회원 정보
@@ -79,8 +82,15 @@ public class UserController {
 
     // 토큰 재발급
     @PostMapping("/token/refresh")
-    public ResponseEntity<TokenDTO> refresh(@RequestBody @Valid RefreshTokenRequestDTO reqDTO) {
-        TokenDTO resDTO = userService.regenerateToken(reqDTO.getRefreshToken());
+    public ResponseEntity<TokenDTO> refresh(@RequestBody @Valid RefreshTokenDTO reqDTO) {
+        TokenDTO resDTO = userService.reissueToken(reqDTO.getRefreshToken());
         return ResponseEntity.ok(resDTO);
+    }
+
+
+    // 로그아웃
+    @PostMapping("/signout")
+    public String logout(@RequestBody @Valid TokenDTO tokenDTO) {
+        return userService.logout(tokenDTO);
     }
 }

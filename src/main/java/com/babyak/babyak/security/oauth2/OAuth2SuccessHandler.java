@@ -1,5 +1,7 @@
 package com.babyak.babyak.security.oauth2;
 
+import com.babyak.babyak.common.error.CustomException;
+import com.babyak.babyak.common.error.ErrorCode;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
