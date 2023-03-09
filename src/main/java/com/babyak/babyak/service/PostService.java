@@ -2,6 +2,8 @@ package com.babyak.babyak.service;
 
 import com.babyak.babyak.DTO.post.PostDTO;
 import com.babyak.babyak.DTO.post.ShowPostDTO;
+import com.babyak.babyak.domain.chat.Chatroom;
+import com.babyak.babyak.domain.chat.ChatroomRepository;
 import com.babyak.babyak.domain.post.Post;
 import com.babyak.babyak.domain.post.PostRepository;
 import com.babyak.babyak.domain.user.User;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final ChatroomRepository chatroomRepository;
 
     public Integer createPost(PostDTO postDTO, Integer userId) {
         Post newPost = new Post();
@@ -70,6 +73,10 @@ public class PostService {
             allPosts.add(showPost(i+1));
         }
         return allPosts;
+    }
+
+    private int getCurrentUserNumber(Integer postId) {
+        return chatroomRepository.findByIdx(postId.longValue()).getCurrentNumber();
     }
 }
 
