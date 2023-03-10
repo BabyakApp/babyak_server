@@ -1,5 +1,7 @@
 package com.babyak.babyak.security.jwt;
 
+import com.babyak.babyak.common.error.CustomException;
+import com.babyak.babyak.common.error.ErrorCode;
 import com.babyak.babyak.dto.token.TokenDTO;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.security.oauth2.UserDetailsServiceImpl;
@@ -102,8 +104,10 @@ public class JwtTokenProvider {
             logger.info("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
             logger.info("만료된 JWT 토큰입니다." + e);
+            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
         } catch (UnsupportedJwtException e) {
             logger.info("지원되지 않는 JWT 토큰입니다.");
+            throw new CustomException(ErrorCode.INVALID_AUTH_TOKEN);
         } catch (IllegalArgumentException e) {
             logger.info("JWT 토큰이 잘못되었습니다.");
         } catch (SignatureException e) {
@@ -132,7 +136,7 @@ public class JwtTokenProvider {
     }
 
 
-    // Token ->> User Email 꺼내기
+    // Token -> User Email 꺼내기
     public String getTokenEmail(String token) {
         return (String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("email");
     }
@@ -165,12 +169,19 @@ public class JwtTokenProvider {
 
             return new TokenDTO(newAccessToken, newRefreshToken);
 
-        } else {
-            // refresh token도 만료 ->  로그인 필요
-
         }
 
-        return null;
+        // refresh token도 만료 ->  로그인 필요
+        throw new RuntimeException("리프레시 토큰 만료, 재로그인 해주세요");
+    }
+
+
+    // token 의 남은 유효 시간 구하기
+    public long getExpiration(String token) {
+        Date expiration = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
+        Long now = new Date().getTime();
+
+        return (expiration.getTime() - now);
     }
 
 

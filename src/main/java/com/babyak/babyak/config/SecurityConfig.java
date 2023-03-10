@@ -2,6 +2,7 @@ package com.babyak.babyak.config;
 
 import com.babyak.babyak.security.jwt.JwtAuthenticationFilter;
 import com.babyak.babyak.security.jwt.JwtTokenProvider;
+import com.babyak.babyak.security.jwt.RedisUtil;
 import com.babyak.babyak.security.oauth2.OAuth2FailureHandler;
 import com.babyak.babyak.security.oauth2.OAuth2SuccessHandler;
 import com.babyak.babyak.security.oauth2.PrincipalDetailsService;
@@ -26,6 +27,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisUtil redisUtil;
     private final PrincipalDetailsService principalDetailsService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
@@ -52,7 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/signup/**").access("hasRole('ROLE_AUTH')")
                 .anyRequest().authenticated();
 
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisUtil), UsernamePasswordAuthenticationFilter.class);
 
         http.oauth2Login()
                 .userInfoEndpoint()

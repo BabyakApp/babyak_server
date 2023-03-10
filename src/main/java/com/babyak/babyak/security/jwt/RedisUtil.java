@@ -23,6 +23,16 @@ public class RedisUtil {
         return stringValueOperations.get(key);
     }
 
+    public void setRedisLogoutAccTkn(String accessToken, Long expiration) {
+        ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
+        stringValueOperations.set(accessToken, "logout", Duration.ofMillis(expiration));
+    }
+
+    public String getRedisLogoutAccTkn(String accessToken) {
+        ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
+        return stringValueOperations.get(accessToken);
+    }
+
     public void deleteData(String key) {
         stringRedisTemplate.delete(key);
     }

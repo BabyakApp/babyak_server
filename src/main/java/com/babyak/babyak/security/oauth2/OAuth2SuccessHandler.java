@@ -2,6 +2,8 @@ package com.babyak.babyak.security.oauth2;
 
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
+import com.babyak.babyak.domain.withdrawal.Withdrawal;
+import com.babyak.babyak.domain.withdrawal.WithdrawalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -17,45 +19,59 @@ import java.io.IOException;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
+    private final WithdrawalRepository withdrawalRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-
         String email = principalDetails.getUser().getEmail();
-        Boolean isBlocked = false;
-        Boolean isEwha = false;
 
 
         // 이미 가입한 적 있는 유저인 경우
         User userEntity = userRepository.findByEmail(email);
         if(userEntity != null) {
-            response.sendRedirect("/user/info");
-            return;
+
+            // (1) Withdrawal : T
+            if(withdrawalRepository.findByUser(userEntity) == null) {
+                response.sendRedirect("/user/auth/ok");
+                return;
+            }
+
+            // (2) Withdrawal : F
+            Withdrawal withdrawal = withdrawalRepository.findByUser(userEntity);
+
+            // (2-1) Withdrawal : T && Blocked : T
+            if(withdrawal.getBlocked()) {
+                response.sendRedirect("/user/reject/" + email + "/blocked");
+                return;
+            }
+
+            // (2-2) Withdrawal : T && Blocked : F
+            else {
+                response.sendRedirect("/user/reject/" + email + "/withdraw");
+                return;
+            }
+
         }
 
 
-        // idBlocked 확인
-
-
-
-
+        // 회원가입
 
         // isEwha 확인
+        Boolean isEwha = false;
         String domain = email.substring(email.indexOf('@') + 1);
         if(domain.equals("ewhain.net")) isEwha = true;
 
 
-        // Entity 생성
-        if(!isBlocked && isEwha) {
+        // (1) 이화인 계정 O : Entity 생성
+        if(isEwha) {
             userEntity = principalDetails.getUser();
             userRepository.save(userEntity);
 
             response.sendRedirect("/user/signup/" + email);
         }
 
+        // (2) 이화인 계정 X
         else if(!isEwha) response.sendRedirect("/user/reject/" + email + "/domain");
-        else if(isBlocked) response.sendRedirect("/user/reject" + email + "/blocked");
-
     }
 }

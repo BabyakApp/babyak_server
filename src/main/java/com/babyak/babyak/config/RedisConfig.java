@@ -32,6 +32,7 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisHost, redisPort);
     }
 
+
     /* 단일 Topic 사용 */
     @Bean
     public ChannelTopic channelTopic() {

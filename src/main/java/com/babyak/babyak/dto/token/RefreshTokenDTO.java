@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshTokenRequestDTO {
+public class RefreshTokenDTO {
 
     @NotNull
     private String refreshToken;
