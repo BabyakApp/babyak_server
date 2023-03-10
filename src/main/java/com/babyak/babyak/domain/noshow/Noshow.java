@@ -23,4 +23,10 @@ public class Noshow {
     @Column(name = "user_id")
     private Integer userId;
 
+    @Column(name = "report_number")
+    private Integer reportNumber;
+
+    @Column(name = "reported")
+    private boolean reported;
+
 }

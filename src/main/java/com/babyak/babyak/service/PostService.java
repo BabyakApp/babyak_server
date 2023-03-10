@@ -41,7 +41,6 @@ public class PostService {
     public ShowPostDTO showPost(Integer postId) {
         Post post = postRepository.findPostByPostId(postId);
         ShowPostDTO showPostDTO = new ShowPostDTO();
-
         showPostDTO.setPostId(postId);
         showPostDTO.setTitle(post.getTitle());
         showPostDTO.setMeetingDate(post.getMeetingDate());
@@ -58,6 +57,8 @@ public class PostService {
         showPostDTO.setHostName(user.getNickname());
         showPostDTO.setHostDept(user.getDepart());
         showPostDTO.setHostStudentId(user.getStudentId() / 100000);
+
+        showPostDTO.setCurrentUser(getCurrentUserNumber(postId));
 
         return showPostDTO;
     }

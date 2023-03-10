@@ -26,4 +26,5 @@ public class ShowPostDTO {
     private String hostDept;
     private Integer hostStudentId; // 학번 앞에 두자리만
     private Integer hostUserId;
+    private Integer currentUser;
 }
