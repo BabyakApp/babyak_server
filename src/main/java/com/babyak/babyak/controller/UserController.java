@@ -1,11 +1,9 @@
 package com.babyak.babyak.controller;
 
-import com.babyak.babyak.common.error.CustomException;
-import com.babyak.babyak.common.error.ErrorCode;
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.dto.ResponseDTO;
 import com.babyak.babyak.dto.token.RefreshTokenDTO;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
+import com.babyak.babyak.dto.user.InfoUpdateRequestDTO;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
 import com.babyak.babyak.dto.token.TokenDTO;
 import com.babyak.babyak.security.jwt.JwtTokenProvider;
@@ -28,23 +26,32 @@ public class UserController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    // 구글 로그인 후 Reject 결과 알려주기 (blocked or domain 문제로 자격 없는 유저)
+    // 로그인 완료 (기존에 가입했던 사용자)
+    @GetMapping("/auth/ok")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> authOk() {
+        return ResponseEntity.ok("로그인이 완료되었습니다.");
+    }
+
+
+    // 구글 로그인 후 Reject 결과 알려주기 (domain/blocked/withdraw 문제로 자격 없는 유저)
     @GetMapping("/reject/{email}/{reason}")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public AuthResponseDTO reject(@PathVariable String email, @PathVariable String reason) {
+    public ResponseEntity<AuthResponseDTO> reject(@PathVariable String email, @PathVariable String reason) {
         AuthResponseDTO resDTO;
         if(reason.equals("blocked")) resDTO = new AuthResponseDTO(email, "blocked");
+        else if(reason.equals("withdraw")) resDTO = new AuthResponseDTO(email, "withdraw");
         else resDTO = new AuthResponseDTO(email, "domain");
 
-        return resDTO;
+        return ResponseEntity.ok(resDTO);
     }
 
     // 구글 로그인 후 회원가입 페이지로 이동
     @GetMapping("/signup/{email}")
     @ResponseStatus(HttpStatus.OK)
-    public AuthResponseDTO signup(@PathVariable String email) {
+    public ResponseEntity<AuthResponseDTO> signup(@PathVariable String email) {
         AuthResponseDTO resDTO = new AuthResponseDTO(email, "");
-        return resDTO;
+        return ResponseEntity.ok(resDTO);
     }
 
     // 닉네임 중복 확인
@@ -58,9 +65,9 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseDTO<TokenDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
+    public ResponseEntity<TokenDTO> signup(@RequestBody @Valid SignUpRequestDTO reqDTO) {
         TokenDTO tokenDTO = userService.signup(reqDTO);
-        return ResponseDTO.of(HttpStatus.OK.value(), "회원가입 성공", tokenDTO);
+        return ResponseEntity.ok(tokenDTO);
     }
 
     // Authentication 회원 정보
@@ -80,6 +87,15 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    // 회원 정보 업데이트
+    @PatchMapping("/info/update")
+    public ResponseEntity<User> updateInfo(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                           @RequestBody InfoUpdateRequestDTO reqDTO) {
+        User user = principalDetails.getUser();
+        return ResponseEntity.ok(userService.updateInfo(user, reqDTO));
+
+    }
+
     // 토큰 재발급
     @PostMapping("/token/refresh")
     public ResponseEntity<TokenDTO> refresh(@RequestBody @Valid RefreshTokenDTO reqDTO) {
@@ -89,8 +105,17 @@ public class UserController {
 
 
     // 로그아웃
-    @PostMapping("/signout")
-    public String logout(@RequestBody @Valid TokenDTO tokenDTO) {
-        return userService.logout(tokenDTO);
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody @Valid TokenDTO tokenDTO) {
+        return ResponseEntity.ok(userService.logout(tokenDTO));
+    }
+
+
+    // 회원 자진 탈퇴
+    @PostMapping("/withdraw")
+    public ResponseEntity<String> withdraw(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                           @RequestBody @Valid TokenDTO tokenDTO) {
+        User user = principalDetails.getUser();
+        return ResponseEntity.ok(userService.withdraw(user, tokenDTO));
     }
 }

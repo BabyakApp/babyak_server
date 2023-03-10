@@ -4,6 +4,9 @@ import com.babyak.babyak.common.error.CustomException;
 import com.babyak.babyak.common.error.ErrorCode;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
+import com.babyak.babyak.domain.withdrawal.Withdrawal;
+import com.babyak.babyak.domain.withdrawal.WithdrawalRepository;
+import com.babyak.babyak.dto.user.InfoUpdateRequestDTO;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
 import com.babyak.babyak.dto.token.TokenDTO;
 import com.babyak.babyak.security.jwt.JwtTokenProvider;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final WithdrawalRepository withdrawalRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisUtil redisUtil;
 
@@ -46,6 +50,17 @@ public class UserService {
         return tokenDTO;
     }
 
+
+    @Transactional
+    public User updateInfo(User user, InfoUpdateRequestDTO reqDTO) {
+        User currentUser = user;
+        if(reqDTO.getNickname() != null) currentUser.setNickname(reqDTO.getNickname());
+        if(reqDTO.getMajor() != null) currentUser.setMajor(reqDTO.getMajor());
+        if(reqDTO.getDepart() != null) currentUser.setDepart(reqDTO.getDepart());
+
+        return userRepository.save(currentUser);
+    }
+
     public TokenDTO reissueToken(String refreshToken) {
         return jwtTokenProvider.reissueToken(refreshToken);
     }
@@ -66,6 +81,22 @@ public class UserService {
         Long expiration = jwtTokenProvider.getExpiration(tokenDTO.getAccessToken());
         redisUtil.setRedisLogoutAccTkn(tokenDTO.getAccessToken(), expiration);
 
-        return "로그아웃 되었습니다.";
+        return "success";
+    }
+
+
+    public String withdraw(User user, TokenDTO tokenDTO) {
+        String logout = logout(tokenDTO);
+        if(logout == "success") {
+            Withdrawal withdrawal = Withdrawal.builder()
+                    .user(user)
+                    .blocked(false)
+                    .build();
+
+            withdrawalRepository.save(withdrawal);
+            return "success";
+        }
+
+        return "fail";
     }
 }

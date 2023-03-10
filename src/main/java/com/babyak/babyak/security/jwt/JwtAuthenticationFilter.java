@@ -28,15 +28,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if(accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
-//                Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
-
                 String isLogout = (String)redisUtil.getRedisLogoutAccTkn(accessToken);
 
                 // 로그아웃하지 않은 사용자인 경우
                 if(ObjectUtils.isEmpty(isLogout)) {
                     Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+
+                else {
+                    SecurityContextHolder.clearContext();
+                    response.sendError(401, "로그아웃된 사용자입니다.");
+                    return;
                 }
 
             }
