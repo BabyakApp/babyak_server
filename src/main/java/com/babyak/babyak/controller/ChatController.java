@@ -1,5 +1,7 @@
 package com.babyak.babyak.controller;
 
+import com.babyak.babyak.domain.chat.Chat;
+import com.babyak.babyak.domain.chat.ChatInfoMapping;
 import com.babyak.babyak.domain.chat.Chatroom;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.dto.chat.*;
@@ -22,13 +24,14 @@ public class ChatController {
     private final ChatService chatService;
 
     /* 채팅방 생성 */
-    @PostMapping("/room")
+    @PostMapping("/room/{roomId}")
     @ResponseBody
     public ResponseEntity<ChatroomResponse> createChatRoom(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestBody ChatroomRequest request) {
+            @RequestBody ChatroomRequest request,
+            @PathVariable Long roomId) {
         User user = principalDetails.getUser();
-        return ResponseEntity.ok(chatService.createChatroom(user, request));
+        return ResponseEntity.ok(chatService.createChatroom(user, request, roomId));
     }
 
 
@@ -93,4 +96,14 @@ public class ChatController {
         Integer userId = principalDetails.getUser().getUserId();
         return ResponseEntity.ok(chatService.deleteChatroom(userId, roomId));
     }
+
+    /* 채팅방의 채팅 목록 반환 */
+    @GetMapping("room/{roomId}")
+    @ResponseBody
+    public ResponseEntity<List<ChatInfoMapping>> getChatList(
+            @PathVariable Long roomId
+    ) {
+        return ResponseEntity.ok(chatService.getChatList(roomId));
+    }
+
 }

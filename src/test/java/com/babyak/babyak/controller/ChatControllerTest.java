@@ -1,29 +1,17 @@
 package com.babyak.babyak.controller;
 
-import com.babyak.babyak.MessageFrameHandler;
 import com.babyak.babyak.StompSupport;
 import com.babyak.babyak.domain.chat.Chatroom;
-import com.babyak.babyak.domain.chat.ChatroomRepository;
-import com.babyak.babyak.domain.user.User;
+import com.babyak.babyak.mongo.ChatroomRepository;
 import com.babyak.babyak.dto.chat.ChatRequest;
 import com.babyak.babyak.dto.chat.ChatResponse;
-import com.babyak.babyak.security.jwt.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 public class ChatControllerTest extends StompSupport {

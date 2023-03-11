@@ -2,8 +2,7 @@ package com.babyak.babyak.service;
 
 import com.babyak.babyak.DTO.post.PostDTO;
 import com.babyak.babyak.DTO.post.ShowPostDTO;
-import com.babyak.babyak.domain.chat.Chatroom;
-import com.babyak.babyak.domain.chat.ChatroomRepository;
+import com.babyak.babyak.mongo.ChatroomRepository;
 import com.babyak.babyak.domain.post.Post;
 import com.babyak.babyak.domain.post.PostRepository;
 import com.babyak.babyak.domain.user.User;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

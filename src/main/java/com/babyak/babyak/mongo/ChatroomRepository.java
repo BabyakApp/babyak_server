@@ -1,5 +1,6 @@
-package com.babyak.babyak.domain.chat;
+package com.babyak.babyak.mongo;
 
+import com.babyak.babyak.domain.chat.ChatInfoMapping;
 import com.babyak.babyak.domain.chat.Chatroom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -20,5 +21,7 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
     public List<Chatroom> findChatroomsByUserListContaining(Integer userId);
 
     public Chatroom findByIdxAndUserListContaining(Long idx, Integer userId);
+
+    public List<ChatInfoMapping> findAllByIdx(Long idx);
 
 }

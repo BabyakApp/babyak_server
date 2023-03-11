@@ -1,16 +1,12 @@
 package com.babyak.babyak.service;
 
-import com.babyak.babyak.domain.chat.Chat;
-import com.babyak.babyak.domain.chat.Chatroom;
-import com.babyak.babyak.domain.chat.ChatroomRepository;
-import com.babyak.babyak.domain.chat.RedisRepository;
+import com.babyak.babyak.domain.chat.*;
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.domain.user.UserRepository;
 import com.babyak.babyak.dto.chat.*;
+import com.babyak.babyak.mongo.ChatroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,19 +19,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatService {
 
-    private final SequenceGeneratorService sequenceGeneratorService;
+    //private final SequenceGeneratorService sequenceGeneratorService;
     private final ChatroomRepository chatroomRepository;
-    private final SimpMessageSendingOperations messagingTemplate;
+    //private final SimpMessageSendingOperations messagingTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic channelTopic;
     private final RedisRepository redisRepository;
 
     /* 채팅방 생성 */
-    public ChatroomResponse createChatroom (User user, ChatroomRequest request) {
+    public ChatroomResponse createChatroom (User user, ChatroomRequest request, Long roomId) {
         Chatroom chatroom = new Chatroom();
 
         // DB 저장
-        chatroom.setIdx(sequenceGeneratorService.generateSequence(Chatroom.SEQUENCE_NAME));
+        //chatroom.setIdx(sequenceGeneratorService.generateSequence(Chatroom.SEQUENCE_NAME));
+        chatroom.setIdx(roomId);
         chatroom.setRoomName(request.getRoomName());
         chatroom.setDescription(request.getDescription());
         chatroom.setHostUserId(user.getUserId());
@@ -205,5 +202,11 @@ public class ChatService {
             return response;
         }
     }
+
+    /* 채팅방의 채팅 목록 가져오기 */
+    public List<ChatInfoMapping> getChatList (Long roomId) {
+        return chatroomRepository.findAllByIdx(roomId);
+    }
+
 
 }
