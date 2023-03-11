@@ -65,6 +65,14 @@ public class UserService {
         return jwtTokenProvider.reissueToken(refreshToken);
     }
 
+    @Transactional
+    public TokenDTO reissueToken(Integer userId, String email) {
+        String accessToken = jwtTokenProvider.createAccessToken(userId, email);
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId, email);
+        TokenDTO resDTO = new TokenDTO(accessToken, refreshToken);
+        return resDTO;
+    }
+
 
     public String logout(TokenDTO tokenDTO) {
         if(!jwtTokenProvider.validateToken(tokenDTO.getAccessToken())) {

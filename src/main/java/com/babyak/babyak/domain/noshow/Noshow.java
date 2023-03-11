@@ -1,6 +1,6 @@
 package com.babyak.babyak.domain.noshow;
 
-import com.babyak.babyak.DTO.noshow.NoshowPK;
+import com.babyak.babyak.dto.noshow.NoshowPK;
 import lombok.*;
 
 import javax.persistence.Column;

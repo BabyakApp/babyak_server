@@ -1,6 +1,6 @@
 package com.babyak.babyak.controller;
 
-import com.babyak.babyak.DTO.user.IdAndNicknameDTO;
+import com.babyak.babyak.dto.user.IdAndNicknameDTO;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.service.NoshowService;
