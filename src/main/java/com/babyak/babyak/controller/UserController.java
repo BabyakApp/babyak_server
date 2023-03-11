@@ -1,6 +1,7 @@
 package com.babyak.babyak.controller;
 
 import com.babyak.babyak.domain.user.User;
+import com.babyak.babyak.domain.user.UserRepository;
 import com.babyak.babyak.dto.token.RefreshTokenDTO;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.dto.user.InfoUpdateRequestDTO;
@@ -24,24 +25,32 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     // 로그인 완료 (기존에 가입했던 사용자)
-    @GetMapping("/auth/ok")
+    @GetMapping("/auth/ok/{email}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> authOk() {
-        return ResponseEntity.ok("로그인이 완료되었습니다.");
+    public ResponseEntity<TokenDTO> authOk(@PathVariable String email) {
+        User user = userRepository.findByEmail(email);
+        TokenDTO resDTO = userService.reissueToken(user.getUserId(), user.getEmail());
+        return ResponseEntity.ok(resDTO);
     }
 
 
     // 구글 로그인 후 Reject 결과 알려주기 (domain/blocked/withdraw 문제로 자격 없는 유저)
-    @GetMapping("/reject/{email}/{reason}")
+    @GetMapping("/auth/reject/{email}/{reason}")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<AuthResponseDTO> reject(@PathVariable String email, @PathVariable String reason) {
         AuthResponseDTO resDTO;
-        if(reason.equals("blocked")) resDTO = new AuthResponseDTO(email, "blocked");
-        else if(reason.equals("withdraw")) resDTO = new AuthResponseDTO(email, "withdraw");
-        else resDTO = new AuthResponseDTO(email, "domain");
+
+        if(reason.equals("blocked"))
+            resDTO = new AuthResponseDTO(email, "blocked");
+
+        else if(reason.equals("withdraw"))
+            resDTO = new AuthResponseDTO(email, "withdraw");
+
+        else
+            resDTO = new AuthResponseDTO(email, "domain");
 
         return ResponseEntity.ok(resDTO);
     }
@@ -79,7 +88,7 @@ public class UserController {
         return ResponseEntity.ok(principalDetails.getUser());
     }
 
-    @GetMapping("/test")
+    @GetMapping("/info/test")
     public ResponseEntity<User> test() {
         PrincipalDetails principalDetails = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = principalDetails.getUser();

@@ -31,22 +31,22 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         User userEntity = userRepository.findByEmail(email);
         if(userEntity != null) {
 
-            // (1) Withdrawal : T
+            // (1) 탈퇴 이력 X
             if(withdrawalRepository.findByUser(userEntity) == null) {
-                response.sendRedirect("/user/auth/ok");
+                response.sendRedirect("/user/auth/ok/" + email);
                 return;
             }
 
-            // (2) Withdrawal : F
+            // (2) 탈퇴 이력 O
             Withdrawal withdrawal = withdrawalRepository.findByUser(userEntity);
 
-            // (2-1) Withdrawal : T && Blocked : T
+            // (2-1) 강제 탈퇴
             if(withdrawal.getBlocked()) {
                 response.sendRedirect("/user/reject/" + email + "/blocked");
                 return;
             }
 
-            // (2-2) Withdrawal : T && Blocked : F
+            // (2-2) 자진 탈퇴
             else {
                 response.sendRedirect("/user/reject/" + email + "/withdraw");
                 return;
@@ -71,7 +71,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             response.sendRedirect("/user/signup/" + email);
         }
 
-        // (2) 이화인 계정 X
+        // (2) 이화인 계정 X : reject
         else if(!isEwha) response.sendRedirect("/user/reject/" + email + "/domain");
     }
 }

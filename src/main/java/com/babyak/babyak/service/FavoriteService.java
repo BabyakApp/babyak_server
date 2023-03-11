@@ -1,6 +1,6 @@
 package com.babyak.babyak.service;
 
-import com.babyak.babyak.DTO.favorite.FavoriteDTO;
+import com.babyak.babyak.dto.favorite.FavoriteDTO;
 import com.babyak.babyak.domain.favorite.Favorite;
 import com.babyak.babyak.domain.favorite.FavoriteRepository;
 import lombok.RequiredArgsConstructor;

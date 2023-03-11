@@ -1,7 +1,7 @@
 package com.babyak.babyak.controller;
 
 import ch.qos.logback.core.joran.spi.NoAutoStart;
-import com.babyak.babyak.DTO.favorite.FavoriteDTO;
+import com.babyak.babyak.dto.favorite.FavoriteDTO;
 import com.babyak.babyak.domain.favorite.Favorite;
 import com.babyak.babyak.domain.post.Post;
 import com.babyak.babyak.domain.user.User;
