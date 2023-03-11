@@ -64,7 +64,7 @@ public class ChatService {
         Integer userId = user.getUserId();
         // 이미 참여한 유저인지
         if (room.getUserList().contains(userId)) {
-            response.setStatus(false);
+            response.setStatus(true);
             response.setMessage("이미 참여하고 있는 채팅방입니다.");
             return response;
         }
