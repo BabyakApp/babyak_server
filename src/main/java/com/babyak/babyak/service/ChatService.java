@@ -101,6 +101,7 @@ public class ChatService {
         String time = LocalDateTime.now().format(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         );
+        String userInfo = user.getMajor() + " " + userYear;
 
         Long roomId = request.getRoomId();
         Chatroom room = chatroomRepository.findByIdx(roomId);
@@ -108,6 +109,7 @@ public class ChatService {
         // DB
         chat.setUserId(user.getUserId());
         chat.setNickname(nickname);
+        chat.setUserInfo(userInfo);
         chat.setMessage(request.getMessage());
         chat.setChatTime(time);
         room.setLastChatTime(time); // 마지막 채팅 시간 업데이트
@@ -122,7 +124,7 @@ public class ChatService {
         // Response
         chatResponse.setRoomId(roomId);
         chatResponse.setUserName(nickname);
-        chatResponse.setUserInfo(nickname + " " + userYear);
+        chatResponse.setUserInfo(userInfo);
         chatResponse.setMessage(request.getMessage());
         chatResponse.setChatTime(time);
 
