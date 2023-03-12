@@ -55,6 +55,7 @@ public class UserService {
     public User updateInfo(User user, InfoUpdateRequestDTO reqDTO) {
         User currentUser = user;
         if(reqDTO.getNickname() != null) currentUser.setNickname(reqDTO.getNickname());
+        if(reqDTO.getStudentId() != null) currentUser.setStudentId(reqDTO.getStudentId());
         if(reqDTO.getMajor() != null) currentUser.setMajor(reqDTO.getMajor());
         if(reqDTO.getDepart() != null) currentUser.setDepart(reqDTO.getDepart());
 
