@@ -39,4 +39,8 @@ public class PostController {
         return postService.showAllPosts();
     }
 
+    @GetMapping("/myposts")
+    public Integer getMyPosts(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        return postService.getMyPost(principalDetails.getUser().getUserId());
+    }
 }

@@ -79,5 +79,9 @@ public class PostService {
     private int getCurrentUserNumber(Integer postId) {
         return chatroomRepository.findByIdx(postId.longValue()).getCurrentNumber();
     }
+
+    public Integer getMyPost(Integer userId){
+        return postRepository.findPostIdByUserId(userId).size();
+    }
 }
 
