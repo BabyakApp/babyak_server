@@ -278,4 +278,7 @@ public class ChatService {
     }
 
 
+    /* 탈퇴한 사용자 -> DB userName을 '(알 수 없음)'으로 수정 */
+
+
 }
