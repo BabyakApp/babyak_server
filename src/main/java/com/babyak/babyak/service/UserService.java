@@ -27,8 +27,9 @@ public class UserService {
 
     @Transactional
     public Boolean availableNickname(String nickname) {
-        User user = userRepository.findByNickname(nickname);
+        if(nickname.equals("(알수없음)")) return false;
 
+        User user = userRepository.findByNickname(nickname);
         if(user == null) return true;
         return false;
     }
