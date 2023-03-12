@@ -1,16 +1,12 @@
 package com.babyak.babyak.service;
 
-import com.babyak.babyak.domain.chat.Chat;
-import com.babyak.babyak.domain.chat.Chatroom;
-import com.babyak.babyak.domain.chat.ChatroomRepository;
-import com.babyak.babyak.domain.chat.RedisRepository;
+import com.babyak.babyak.domain.chat.*;
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.domain.user.UserRepository;
 import com.babyak.babyak.dto.chat.*;
+import com.babyak.babyak.mongo.ChatroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,19 +19,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatService {
 
-    private final SequenceGeneratorService sequenceGeneratorService;
+    //private final SequenceGeneratorService sequenceGeneratorService;
     private final ChatroomRepository chatroomRepository;
-    private final SimpMessageSendingOperations messagingTemplate;
+    //private final SimpMessageSendingOperations messagingTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic channelTopic;
     private final RedisRepository redisRepository;
 
     /* 채팅방 생성 */
-    public ChatroomResponse createChatroom (User user, ChatroomRequest request) {
+    public ChatroomResponse createChatroom (User user, ChatroomRequest request, Long roomId) {
         Chatroom chatroom = new Chatroom();
 
         // DB 저장
-        chatroom.setIdx(sequenceGeneratorService.generateSequence(Chatroom.SEQUENCE_NAME));
+        //chatroom.setIdx(sequenceGeneratorService.generateSequence(Chatroom.SEQUENCE_NAME));
+        chatroom.setIdx(roomId);
         chatroom.setRoomName(request.getRoomName());
         chatroom.setDescription(request.getDescription());
         chatroom.setHostUserId(user.getUserId());
@@ -64,7 +61,7 @@ public class ChatService {
         Integer userId = user.getUserId();
         // 이미 참여한 유저인지
         if (room.getUserList().contains(userId)) {
-            response.setStatus(false);
+            response.setStatus(true);
             response.setMessage("이미 참여하고 있는 채팅방입니다.");
             return response;
         }
@@ -77,11 +74,44 @@ public class ChatService {
         }
 
         // DB
+        String nickname = user.getNickname();
+        String userYear = user.getStudentId().toString().substring(0, 2);
+        String time = LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        );
+        String userInfo = user.getMajor() + " " + userYear;
+
+        Chat chat = new Chat();
+        chat.setMessageType(Chat.MessageType.ENTER);
+        chat.setUserId(user.getUserId());
+        chat.setNickname(nickname);
+        chat.setUserInfo(userInfo);
+        chat.setMessage(nickname + " 님이 들어오셨습니다.");
+        chat.setChatTime(time);
+
         room.setCurrentNumber(room.getCurrentNumber() + 1);
         List<Integer> newUserList = room.getUserList();
         newUserList.add(userId);
         room.setUserList(newUserList);
+        room.setLastChatTime(time); // 마지막 채팅 시간 업데이트
+        List<Chat> chatList = room.getChats();
+        if (chatList == null) {
+            chatList = new ArrayList<>();
+        }
+        chatList.add(chat);
+        room.setChats(chatList); // 채팅 내역 업데이트
         chatroomRepository.save(room); // db update
+
+
+        // STOMP
+        ChatResponse chatResponse = new ChatResponse();
+        chatResponse.setRoomId(roomId);
+        chatResponse.setMessageType(ChatResponse.MessageType.ENTER);
+        chatResponse.setUserName(nickname);
+        chatResponse.setUserInfo(userInfo);
+        chatResponse.setMessage(nickname + " 님이 들어오셨습니다.");
+        chatResponse.setChatTime(time);
+        redisTemplate.convertAndSend(channelTopic.getTopic(), chatResponse);
 
         response.setStatus(true);
         response.setMessage(user.getNickname() + " 님이 들어오셨습니다.");
@@ -101,13 +131,16 @@ public class ChatService {
         String time = LocalDateTime.now().format(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         );
+        String userInfo = user.getMajor() + " " + userYear;
 
         Long roomId = request.getRoomId();
         Chatroom room = chatroomRepository.findByIdx(roomId);
 
         // DB
+        chat.setMessageType(Chat.MessageType.TALK);
         chat.setUserId(user.getUserId());
         chat.setNickname(nickname);
+        chat.setUserInfo(userInfo);
         chat.setMessage(request.getMessage());
         chat.setChatTime(time);
         room.setLastChatTime(time); // 마지막 채팅 시간 업데이트
@@ -121,8 +154,9 @@ public class ChatService {
 
         // Response
         chatResponse.setRoomId(roomId);
+        chatResponse.setMessageType(ChatResponse.MessageType.TALK);
         chatResponse.setUserName(nickname);
-        chatResponse.setUserInfo(nickname + " " + userYear);
+        chatResponse.setUserInfo(userInfo);
         chatResponse.setMessage(request.getMessage());
         chatResponse.setChatTime(time);
 
@@ -138,6 +172,7 @@ public class ChatService {
         return chatroomList;
     }
 
+
     /* 참여한 채팅방 목록 반환 */
     public List<ChatroomListResponse> getUserChatroomList(Integer userId) {
         List<Chatroom> chatroomList = chatroomRepository.findChatroomsByUserListContaining(userId);
@@ -152,17 +187,50 @@ public class ChatService {
     }
 
     /* 채팅방 나가기 */
-    public CheckResponse leaveChatroom(Integer userId, Long roomId) {
+    public CheckResponse leaveChatroom(User user, Long roomId) {
         CheckResponse response = new CheckResponse();
 
         try {
+            Integer userId = user.getUserId();
             Chatroom room = chatroomRepository.findByIdxAndUserListContaining(roomId, userId);
 
+            String nickname = user.getNickname();
+            String userYear = user.getStudentId().toString().substring(0, 2);
+            String time = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            );
+            String userInfo = user.getMajor() + " " + userYear;
+
+            // DB
+            Chat chat = new Chat();
+            chat.setMessageType(Chat.MessageType.EXIT);
+            chat.setUserId(userId);
+            chat.setNickname(nickname);
+            chat.setUserInfo(userInfo);
+            chat.setMessage(nickname + " 님이 방에서 나왔습니다.");
+            chat.setChatTime(time);
             room.setCurrentNumber(room.getCurrentNumber() - 1);
             List<Integer> newUserList = room.getUserList();
             newUserList.remove(userId);
             room.setUserList(newUserList);
+            room.setLastChatTime(time); // 마지막 채팅 시간 업데이트
+            List<Chat> chatList = room.getChats();
+            if (chatList == null) {
+                chatList = new ArrayList<>();
+            }
+            chatList.add(chat);
+            room.setChats(chatList); // 채팅 내역 업데이트
             chatroomRepository.save(room);
+
+            // STOMP
+            ChatResponse chatResponse = new ChatResponse();
+            chatResponse.setRoomId(roomId);
+            chatResponse.setMessageType(ChatResponse.MessageType.EXIT);
+            chatResponse.setUserName(nickname);
+            chatResponse.setUserInfo(userInfo);
+            chatResponse.setMessage(nickname + " 님이 방에서 나왔습니다.");
+            chatResponse.setChatTime(time);
+            redisTemplate.convertAndSend(channelTopic.getTopic(), chatResponse);
 
             response.setStatus(true);
             response.setMessage("[" + room.getRoomName() + "] 방에서 나왔습니다.");
@@ -203,5 +271,14 @@ public class ChatService {
             return response;
         }
     }
+
+    /* 채팅방의 채팅 목록 가져오기 */
+    public List<ChatInfoMapping> getChatList (Long roomId) {
+        return chatroomRepository.findAllByIdx(roomId);
+    }
+
+
+    /* 탈퇴한 사용자 -> DB userName을 '(알 수 없음)'으로 수정 */
+
 
 }

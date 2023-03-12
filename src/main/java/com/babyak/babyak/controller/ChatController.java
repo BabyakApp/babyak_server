@@ -1,11 +1,15 @@
 package com.babyak.babyak.controller;
 
+import com.babyak.babyak.domain.chat.Chat;
+import com.babyak.babyak.domain.chat.ChatInfoMapping;
 import com.babyak.babyak.domain.chat.Chatroom;
 import com.babyak.babyak.domain.user.User;
+import com.babyak.babyak.dto.ResponseDTO;
 import com.babyak.babyak.dto.chat.*;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,27 +26,34 @@ public class ChatController {
     private final ChatService chatService;
 
     /* 채팅방 생성 */
-    @PostMapping("/room")
+    @PostMapping("/room/{roomId}")
     @ResponseBody
-    public ResponseEntity<ChatroomResponse> createChatRoom(
+    public ResponseEntity createChatRoom(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @RequestBody ChatroomRequest request) {
+            @RequestBody ChatroomRequest request,
+            @PathVariable Long roomId) {
         User user = principalDetails.getUser();
-        return ResponseEntity.ok(chatService.createChatroom(user, request));
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                chatService.createChatroom(user, request, roomId)
+        ), HttpStatus.OK);
     }
 
 
     /* 채팅방 입장 */
     @GetMapping("/enter/{roomId}")
     @ResponseBody
-    public ResponseEntity<CheckResponse> enterChatroom (
+    public ResponseEntity enterChatroom (
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable Long roomId
     ) {
         User user = principalDetails.getUser();
-        return ResponseEntity.ok(
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
                 chatService.enterChatroom(user, roomId)
-        );
+        ), HttpStatus.OK);
     }
 
 
@@ -58,7 +69,13 @@ public class ChatController {
     @GetMapping("/allRoom")
     @ResponseBody
     public ResponseEntity<List<Chatroom>> getAllChatroom() {
-        return ResponseEntity.ok(chatService.getAllChatroom());
+
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                chatService.getAllChatroom()
+        ), HttpStatus.OK);
+
     }
 
 
@@ -69,7 +86,11 @@ public class ChatController {
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         Integer userId = principalDetails.getUser().getUserId();
-        return ResponseEntity.ok(chatService.getUserChatroomList(userId));
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                chatService.getUserChatroomList(userId)
+        ), HttpStatus.OK);
     }
 
     /* 채팅방 나가기 */
@@ -79,8 +100,12 @@ public class ChatController {
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable Long roomId
     ) {
-        Integer userId = principalDetails.getUser().getUserId();
-        return ResponseEntity.ok(chatService.leaveChatroom(userId, roomId));
+        User user = principalDetails.getUser();
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                chatService.leaveChatroom(user, roomId)
+        ), HttpStatus.OK);
     }
 
     /* 채팅방 삭제 */
@@ -91,6 +116,24 @@ public class ChatController {
             @PathVariable Long roomId
     ) {
         Integer userId = principalDetails.getUser().getUserId();
-        return ResponseEntity.ok(chatService.deleteChatroom(userId, roomId));
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                chatService.deleteChatroom(userId, roomId)
+        ), HttpStatus.OK);
     }
+
+    /* 채팅방의 채팅 목록 반환 */
+    @GetMapping("room/{roomId}")
+    @ResponseBody
+    public ResponseEntity<List<ChatInfoMapping>> getChatList(
+            @PathVariable Long roomId
+    ) {
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                chatService.getChatList(roomId)
+        ), HttpStatus.OK);
+    }
+
 }

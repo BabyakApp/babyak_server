@@ -35,7 +35,7 @@ dependencies {
 
 	// DB
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+	//implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
 	compileOnly 'org.projectlombok:lombok'

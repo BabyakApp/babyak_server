@@ -1,15 +1,38 @@
 package com.babyak.babyak.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@Getter @Builder
-@RequiredArgsConstructor(staticName = "of")
+@Data
+@AllArgsConstructor
+@Builder
 public class ResponseDTO<T> {
 
-    private final int statusCode;
-    private final String message;
-    private final T data;
+    private int statusCode;
+    private String message;
+    private T data;
+
+    public ResponseDTO (int statusCode) {
+        this.statusCode = statusCode;
+        this.message = null;
+        this.data = null;
+    }
+
+    public ResponseDTO (int statusCode, String message) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.data = null;
+    }
+
+    public static<T> ResponseDTO<T> response (int statusCode) {
+        return response(statusCode, null, null);
+    }
+
+    public static<T> ResponseDTO<T> response(int statusCode, String message, T data) {
+        return ResponseDTO.<T>builder()
+                .statusCode(statusCode)
+                .message(message)
+                .data(data)
+                .build();
+    }
 
 }
