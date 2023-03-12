@@ -82,8 +82,8 @@ public class ChatController {
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable Long roomId
     ) {
-        Integer userId = principalDetails.getUser().getUserId();
-        return ResponseEntity.ok(chatService.leaveChatroom(userId, roomId));
+        User user = principalDetails.getUser();
+        return ResponseEntity.ok(chatService.leaveChatroom(user, roomId));
     }
 
     /* 채팅방 삭제 */

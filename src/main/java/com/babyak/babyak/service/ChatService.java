@@ -74,11 +74,44 @@ public class ChatService {
         }
 
         // DB
+        String nickname = user.getNickname();
+        String userYear = user.getStudentId().toString().substring(0, 2);
+        String time = LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        );
+        String userInfo = user.getMajor() + " " + userYear;
+
+        Chat chat = new Chat();
+        chat.setMessageType(Chat.MessageType.ENTER);
+        chat.setUserId(user.getUserId());
+        chat.setNickname(nickname);
+        chat.setUserInfo(userInfo);
+        chat.setMessage(nickname + " 님이 들어오셨습니다.");
+        chat.setChatTime(time);
+
         room.setCurrentNumber(room.getCurrentNumber() + 1);
         List<Integer> newUserList = room.getUserList();
         newUserList.add(userId);
         room.setUserList(newUserList);
+        room.setLastChatTime(time); // 마지막 채팅 시간 업데이트
+        List<Chat> chatList = room.getChats();
+        if (chatList == null) {
+            chatList = new ArrayList<>();
+        }
+        chatList.add(chat);
+        room.setChats(chatList); // 채팅 내역 업데이트
         chatroomRepository.save(room); // db update
+
+
+        // STOMP
+        ChatResponse chatResponse = new ChatResponse();
+        chatResponse.setRoomId(roomId);
+        chatResponse.setMessageType(ChatResponse.MessageType.ENTER);
+        chatResponse.setUserName(nickname);
+        chatResponse.setUserInfo(userInfo);
+        chatResponse.setMessage(nickname + " 님이 들어오셨습니다.");
+        chatResponse.setChatTime(time);
+        redisTemplate.convertAndSend(channelTopic.getTopic(), chatResponse);
 
         response.setStatus(true);
         response.setMessage(user.getNickname() + " 님이 들어오셨습니다.");
@@ -104,6 +137,7 @@ public class ChatService {
         Chatroom room = chatroomRepository.findByIdx(roomId);
 
         // DB
+        chat.setMessageType(Chat.MessageType.TALK);
         chat.setUserId(user.getUserId());
         chat.setNickname(nickname);
         chat.setUserInfo(userInfo);
@@ -120,6 +154,7 @@ public class ChatService {
 
         // Response
         chatResponse.setRoomId(roomId);
+        chatResponse.setMessageType(ChatResponse.MessageType.TALK);
         chatResponse.setUserName(nickname);
         chatResponse.setUserInfo(userInfo);
         chatResponse.setMessage(request.getMessage());
@@ -137,6 +172,7 @@ public class ChatService {
         return chatroomList;
     }
 
+
     /* 참여한 채팅방 목록 반환 */
     public List<ChatroomListResponse> getUserChatroomList(Integer userId) {
         List<Chatroom> chatroomList = chatroomRepository.findChatroomsByUserListContaining(userId);
@@ -151,17 +187,50 @@ public class ChatService {
     }
 
     /* 채팅방 나가기 */
-    public CheckResponse leaveChatroom(Integer userId, Long roomId) {
+    public CheckResponse leaveChatroom(User user, Long roomId) {
         CheckResponse response = new CheckResponse();
 
         try {
+            Integer userId = user.getUserId();
             Chatroom room = chatroomRepository.findByIdxAndUserListContaining(roomId, userId);
 
+            String nickname = user.getNickname();
+            String userYear = user.getStudentId().toString().substring(0, 2);
+            String time = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            );
+            String userInfo = user.getMajor() + " " + userYear;
+
+            // DB
+            Chat chat = new Chat();
+            chat.setMessageType(Chat.MessageType.EXIT);
+            chat.setUserId(userId);
+            chat.setNickname(nickname);
+            chat.setUserInfo(userInfo);
+            chat.setMessage(nickname + " 님이 방에서 나왔습니다.");
+            chat.setChatTime(time);
             room.setCurrentNumber(room.getCurrentNumber() - 1);
             List<Integer> newUserList = room.getUserList();
             newUserList.remove(userId);
             room.setUserList(newUserList);
+            room.setLastChatTime(time); // 마지막 채팅 시간 업데이트
+            List<Chat> chatList = room.getChats();
+            if (chatList == null) {
+                chatList = new ArrayList<>();
+            }
+            chatList.add(chat);
+            room.setChats(chatList); // 채팅 내역 업데이트
             chatroomRepository.save(room);
+
+            // STOMP
+            ChatResponse chatResponse = new ChatResponse();
+            chatResponse.setRoomId(roomId);
+            chatResponse.setMessageType(ChatResponse.MessageType.EXIT);
+            chatResponse.setUserName(nickname);
+            chatResponse.setUserInfo(userInfo);
+            chatResponse.setMessage(nickname + " 님이 방에서 나왔습니다.");
+            chatResponse.setChatTime(time);
+            redisTemplate.convertAndSend(channelTopic.getTopic(), chatResponse);
 
             response.setStatus(true);
             response.setMessage("[" + room.getRoomName() + "] 방에서 나왔습니다.");
