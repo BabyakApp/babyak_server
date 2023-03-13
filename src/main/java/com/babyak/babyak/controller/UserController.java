@@ -1,22 +1,22 @@
 package com.babyak.babyak.controller;
 
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.domain.user.UserRepository;
+import com.babyak.babyak.dto.ResponseDTO;
 import com.babyak.babyak.dto.token.RefreshTokenDTO;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.dto.user.InfoUpdateRequestDTO;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
 import com.babyak.babyak.dto.token.TokenDTO;
-import com.babyak.babyak.security.jwt.JwtTokenProvider;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 
 @RestController
@@ -25,9 +25,19 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     // 인증 처리
+    @GetMapping("/auth")
+    public ResponseEntity auth(@RequestParam String result) throws JsonProcessingException {
+        AuthResponseDTO responseDTO = objectMapper.readValue(result, AuthResponseDTO.class);
+
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                responseDTO
+        ), HttpStatus.OK);
+    }
 
 
     // 닉네임 중복 확인
