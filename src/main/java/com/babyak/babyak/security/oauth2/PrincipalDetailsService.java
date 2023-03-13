@@ -38,6 +38,7 @@ public class PrincipalDetailsService extends DefaultOAuth2UserService {
                     .noShow(0)
                     .role("ROLE_AUTH")
                     .build();
+
         }
 
         // (2) 자진 탈퇴했던 사용자의 경우

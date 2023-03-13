@@ -1,7 +1,7 @@
 package com.babyak.babyak.service;
 
-import com.babyak.babyak.DTO.post.PostDTO;
-import com.babyak.babyak.DTO.post.ShowPostDTO;
+import com.babyak.babyak.dto.post.PostDTO;
+import com.babyak.babyak.dto.post.ShowPostDTO;
 import com.babyak.babyak.mongo.ChatroomRepository;
 import com.babyak.babyak.domain.post.Post;
 import com.babyak.babyak.domain.post.PostRepository;

@@ -1,4 +1,4 @@
-package com.babyak.babyak.DTO.post;
+package com.babyak.babyak.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

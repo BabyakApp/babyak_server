@@ -1,22 +1,22 @@
 package com.babyak.babyak.controller;
 
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.domain.user.UserRepository;
+import com.babyak.babyak.dto.ResponseDTO;
 import com.babyak.babyak.dto.token.RefreshTokenDTO;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.dto.user.InfoUpdateRequestDTO;
 import com.babyak.babyak.dto.user.SignUpRequestDTO;
 import com.babyak.babyak.dto.token.TokenDTO;
-import com.babyak.babyak.security.jwt.JwtTokenProvider;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 
 @RestController
@@ -25,43 +25,20 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
-    // 로그인 완료 (기존에 가입했던 사용자)
-    @GetMapping("/auth/ok/{email}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TokenDTO> authOk(@PathVariable String email) {
-        User user = userRepository.findByEmail(email);
-        TokenDTO resDTO = userService.reissueToken(user.getUserId(), user.getEmail());
-        return ResponseEntity.ok(resDTO);
+    // 인증 처리
+    @GetMapping("/auth")
+    public ResponseEntity auth(@RequestParam String result) throws JsonProcessingException {
+        AuthResponseDTO responseDTO = objectMapper.readValue(result, AuthResponseDTO.class);
+
+        return new ResponseEntity(ResponseDTO.response(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                responseDTO
+        ), HttpStatus.OK);
     }
 
-
-    // 구글 로그인 후 Reject 결과 알려주기 (domain/blocked/withdraw 문제로 자격 없는 유저)
-    @GetMapping("/auth/reject/{email}/{reason}")
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<AuthResponseDTO> reject(@PathVariable String email, @PathVariable String reason) {
-        AuthResponseDTO resDTO;
-
-        if(reason.equals("blocked"))
-            resDTO = new AuthResponseDTO(email, "blocked");
-
-        else if(reason.equals("withdraw"))
-            resDTO = new AuthResponseDTO(email, "withdraw");
-
-        else
-            resDTO = new AuthResponseDTO(email, "domain");
-
-        return ResponseEntity.ok(resDTO);
-    }
-
-    // 구글 로그인 후 회원가입 페이지로 이동
-    @GetMapping("/signup/{email}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<AuthResponseDTO> signup(@PathVariable String email) {
-        AuthResponseDTO resDTO = new AuthResponseDTO(email, "");
-        return ResponseEntity.ok(resDTO);
-    }
 
     // 닉네임 중복 확인
     @GetMapping("/signup/check/{nickname}")

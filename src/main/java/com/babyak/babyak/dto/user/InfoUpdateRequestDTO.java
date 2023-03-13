@@ -20,6 +20,8 @@ public class InfoUpdateRequestDTO {
     @Pattern(regexp = "^[가-힣0-9]{2,12}$", message = "한글이나 숫자로만 이루어진 2~12자 닉네임을 입력해주세요")
     private String nickname;
 
+    private Integer studentId;
+
     private String depart;
 
     private String major;
