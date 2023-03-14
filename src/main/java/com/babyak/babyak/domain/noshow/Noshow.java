@@ -14,6 +14,7 @@ import javax.persistence.IdClass;
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(NoshowPK.class)
+
 public class Noshow {
     @Id
     @Column(name = "post_id")
@@ -28,5 +29,9 @@ public class Noshow {
 
     @Column(name = "reported")
     private boolean reported;
+
+    public void increaseNum(){
+        this.reportNumber++;
+    }
 
 }

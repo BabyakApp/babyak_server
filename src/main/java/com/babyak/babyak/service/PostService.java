@@ -8,10 +8,10 @@ import com.babyak.babyak.domain.post.PostRepository;
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -66,16 +66,20 @@ public class PostService {
     }
 
     public List<ShowPostDTO> showAllPosts(){
-        List<Integer> postId = showAllPostId();
+        List<Integer> postIds = showAllPostId();
         List<ShowPostDTO> allPosts = new ArrayList<>();
-        for(int i=0; i<postId.size();i++){
-            allPosts.add(showPost(i+1));
+        for(Integer postId : postIds){
+            allPosts.add(showPost(postId));
         }
         return allPosts;
     }
 
     private int getCurrentUserNumber(Integer postId) {
         return chatroomRepository.findByIdx(postId.longValue()).getCurrentNumber();
+    }
+
+    public Integer countMyPosts(Integer userId){
+        return postRepository.findPostsByUserId(userId).size();
     }
 }
 
