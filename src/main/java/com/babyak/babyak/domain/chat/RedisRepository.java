@@ -1,6 +1,6 @@
 package com.babyak.babyak.domain.chat;
 
-import com.babyak.babyak.dto.chat.RedisChatroom;
+import com.babyak.babyak.DTO.chat.RedisChatroom;
 import com.babyak.babyak.service.redis.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;

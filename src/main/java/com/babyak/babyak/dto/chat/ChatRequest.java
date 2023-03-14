@@ -1,4 +1,4 @@
-package com.babyak.babyak.dto.chat;
+package com.babyak.babyak.DTO.chat;
 
 import lombok.*;
 

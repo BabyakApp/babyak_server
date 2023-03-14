@@ -1,4 +1,4 @@
-package com.babyak.babyak.dto;
+package com.babyak.babyak.DTO;
 
 import lombok.*;
 

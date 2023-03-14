@@ -2,7 +2,7 @@ package com.babyak.babyak.service;
 
 import com.babyak.babyak.domain.chat.*;
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.dto.chat.*;
+import com.babyak.babyak.DTO.chat.*;
 import com.babyak.babyak.mongo.ChatroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

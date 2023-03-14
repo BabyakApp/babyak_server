@@ -6,6 +6,7 @@ import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.service.NoshowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +20,13 @@ public class NoshowController {
     NoshowService noshowService;
 
     @GetMapping("/{postId}")
-    public List<IdAndNicknameDTO> findUserList(@PathVariable Integer postId){
-        return noshowService.findUserList(postId);
+    public ResponseEntity<List<IdAndNicknameDTO>> findUserList(@PathVariable Integer postId){
+        return ResponseEntity.ok(noshowService.findUserList(postId));
     }
 
     @PostMapping("/{postId}")
-    public void reportUser(@PathVariable Integer postId, Integer userId){
+    public ResponseEntity reportUser(@PathVariable Integer postId, Integer userId){
         noshowService.reportUser(postId, userId);
+        return ResponseEntity.ok().build();
     }
 }

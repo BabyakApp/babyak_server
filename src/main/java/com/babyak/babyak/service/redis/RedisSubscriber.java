@@ -1,6 +1,6 @@
 package com.babyak.babyak.service.redis;
 
-import com.babyak.babyak.dto.chat.ChatResponse;
+import com.babyak.babyak.DTO.chat.ChatResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

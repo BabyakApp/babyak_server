@@ -1,7 +1,7 @@
 package com.babyak.babyak.controller;
 
 import com.babyak.babyak.domain.user.User;
-import com.babyak.babyak.dto.ResponseDTO;
+import com.babyak.babyak.DTO.ResponseDTO;
 import com.babyak.babyak.dto.token.RefreshTokenDTO;
 import com.babyak.babyak.dto.user.AuthResponseDTO;
 import com.babyak.babyak.dto.user.InfoUpdateRequestDTO;

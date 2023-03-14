@@ -13,7 +13,7 @@ import java.util.List;
 public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
 
-    public boolean isLike(FavoriteDTO favoriteDTO){
+    public Boolean isLike(FavoriteDTO favoriteDTO){
         return favoriteRepository.existsByUserIdAndPostId(favoriteDTO.getUserId(), favoriteDTO.getPostId());
     }
     public Integer existsLike(FavoriteDTO favoriteDTO){
