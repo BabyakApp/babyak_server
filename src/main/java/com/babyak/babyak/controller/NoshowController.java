@@ -1,6 +1,6 @@
 package com.babyak.babyak.controller;
 
-import com.babyak.babyak.dto.user.IdAndNicknameDTO;
+import com.babyak.babyak.DTO.user.IdAndNicknameDTO;
 import com.babyak.babyak.service.NoshowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
