@@ -2,7 +2,7 @@ package com.babyak.babyak.security.jwt;
 
 import com.babyak.babyak.common.error.CustomException;
 import com.babyak.babyak.common.error.ErrorCode;
-import com.babyak.babyak.dto.token.TokenDTO;
+import com.babyak.babyak.DTO.token.TokenDTO;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.security.oauth2.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;

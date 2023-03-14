@@ -1,6 +1,6 @@
 package com.babyak.babyak.service;
 
-import com.babyak.babyak.dto.user.IdAndNicknameDTO;
+import com.babyak.babyak.DTO.user.IdAndNicknameDTO;
 import com.babyak.babyak.mongo.ChatroomRepository;
 import com.babyak.babyak.domain.noshow.Noshow;
 import com.babyak.babyak.domain.noshow.NoshowRepository;

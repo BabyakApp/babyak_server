@@ -2,11 +2,11 @@ package com.babyak.babyak.controller;
 
 import com.babyak.babyak.domain.user.User;
 import com.babyak.babyak.DTO.ResponseDTO;
-import com.babyak.babyak.dto.token.RefreshTokenDTO;
-import com.babyak.babyak.dto.user.AuthResponseDTO;
-import com.babyak.babyak.dto.user.InfoUpdateRequestDTO;
-import com.babyak.babyak.dto.user.SignUpRequestDTO;
-import com.babyak.babyak.dto.token.TokenDTO;
+import com.babyak.babyak.DTO.token.RefreshTokenDTO;
+import com.babyak.babyak.DTO.user.AuthResponseDTO;
+import com.babyak.babyak.DTO.user.InfoUpdateRequestDTO;
+import com.babyak.babyak.DTO.user.SignUpRequestDTO;
+import com.babyak.babyak.DTO.token.TokenDTO;
 import com.babyak.babyak.security.oauth2.PrincipalDetails;
 import com.babyak.babyak.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;

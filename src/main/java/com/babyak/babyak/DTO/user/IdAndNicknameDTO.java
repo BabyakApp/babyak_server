@@ -1,4 +1,4 @@
-package com.babyak.babyak.dto.user;
+package com.babyak.babyak.DTO.user;
 
 import lombok.Getter;
 import lombok.Setter;

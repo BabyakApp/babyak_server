@@ -1,6 +1,5 @@
 package com.babyak.babyak.domain.post;
 
-import com.babyak.babyak.dto.post.ShowPostDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

@@ -1,6 +1,6 @@
 package com.babyak.babyak.domain.user;
 
-import com.babyak.babyak.dto.user.SignUpRequestDTO;
+import com.babyak.babyak.DTO.user.SignUpRequestDTO;
 import lombok.*;
 
 import javax.persistence.*;

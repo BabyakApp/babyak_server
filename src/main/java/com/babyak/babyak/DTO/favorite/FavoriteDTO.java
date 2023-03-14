@@ -1,4 +1,4 @@
-package com.babyak.babyak.dto.favorite;
+package com.babyak.babyak.DTO.favorite;
 
 import lombok.*;
 

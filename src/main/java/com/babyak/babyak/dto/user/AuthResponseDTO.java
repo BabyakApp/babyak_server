@@ -1,6 +1,6 @@
-package com.babyak.babyak.dto.user;
+package com.babyak.babyak.DTO.user;
 
-import com.babyak.babyak.dto.token.TokenDTO;
+import com.babyak.babyak.DTO.token.TokenDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
